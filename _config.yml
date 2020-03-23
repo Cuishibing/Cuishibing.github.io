@@ -7,13 +7,13 @@ title: Cuishibing
 subtitle: '想不到好名字'
 description: '我的小博客'
 keywords:
-author: John Doe
+author: Cuishibing
 language: en
 timezone: ''
 
 # URL
 ## If your site is put in a subdirectory, set url as 'http://yoursite.com/child' and root as '/child/'
-url: http://yoursite.com
+url: https://cuishibing.github.io/
 root: /
 permalink: :year/:month/:day/:title/
 permalink_defaults:
@@ -41,7 +41,7 @@ external_link:
   exclude: ''
 filename_case: 0
 render_drafts: false
-post_asset_folder: false
+post_asset_folder: true
 relative_link: false
 future: true
 highlight:
