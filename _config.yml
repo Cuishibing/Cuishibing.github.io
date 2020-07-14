@@ -8,7 +8,7 @@ subtitle: '想不到好名字'
 description: '我的小博客'
 keywords:
 author: Cuishibing
-language: en
+language: zh-CN
 timezone: ''
 
 # URL
@@ -47,7 +47,7 @@ future: true
 highlight:
   enable: true
   line_number: true
-  auto_detect: false
+  auto_detect: true
   tab_replace: ''
   wrap: true
   hljs: false
@@ -93,7 +93,32 @@ ignore:
 # Extensions
 ## Plugins: https://hexo.io/plugins/
 ## Themes: https://hexo.io/themes/
+## theme: landscape
+
+# yilia start#
 theme: landscape
+
+
+jsonContent:
+  meta: false
+  pages: false
+  posts:
+    title: true
+    date: true
+    path: true
+    text: false
+    raw: false
+    content: false
+    slug: false
+    updated: false
+    comments: false
+    link: false
+    permalink: false
+    excerpt: false
+    categories: false
+    tags: true
+
+# yilia end#
 
 # Deployment
 ## Docs: https://hexo.io/docs/deployment.html
