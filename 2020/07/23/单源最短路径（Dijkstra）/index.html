@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+
+  
+  <title>单源最短路径（Dijkstra） | Cuishibing</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="图的邻接表表示">
+<meta property="og:type" content="article">
+<meta property="og:title" content="单源最短路径（Dijkstra）">
+<meta property="og:url" content="https://cuishibing.github.io/2020/07/23/%E5%8D%95%E6%BA%90%E6%9C%80%E7%9F%AD%E8%B7%AF%E5%BE%84%EF%BC%88Dijkstra%EF%BC%89/index.html">
+<meta property="og:site_name" content="Cuishibing">
+<meta property="og:description" content="图的邻接表表示">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2020-07-23T13:21:10.000Z">
+<meta property="article:modified_time" content="2020-07-23T14:49:29.832Z">
+<meta property="article:author" content="Cuishibing">
+<meta property="article:tag" content="算法">
+<meta name="twitter:card" content="summary">
+  
+    <link rel="alternate" href="/atom.xml" title="Cuishibing" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+
+<meta name="generator" content="Hexo 4.2.1"></head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Cuishibing</a>
+      </h1>
+      
+        <h2 id="subtitle-wrap">
+          <a href="/" id="subtitle">想不到好名字</a>
+        </h2>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="搜索"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="https://cuishibing.github.io"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-单源最短路径（Dijkstra）" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2020/07/23/%E5%8D%95%E6%BA%90%E6%9C%80%E7%9F%AD%E8%B7%AF%E5%BE%84%EF%BC%88Dijkstra%EF%BC%89/" class="article-date">
+  <time datetime="2020-07-23T13:21:10.000Z" itemprop="datePublished">2020-07-23</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      单源最短路径（Dijkstra）
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h2 id="图的邻接表表示"><a href="#图的邻接表表示" class="headerlink" title="图的邻接表表示"></a>图的邻接表表示</h2><a id="more"></a>
+<p>图的节点:</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment">* 图的节点</span></span><br><span class="line"><span class="comment">*/</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">GraphNode</span>&lt;<span class="title">T</span>&gt; </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> T value;</span><br><span class="line">    <span class="comment">// 一条边</span></span><br><span class="line">    <span class="keyword">private</span> GraphSide&lt;T&gt; sideHead;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 最后一条边</span></span><br><span class="line">    <span class="keyword">private</span> GraphSide&lt;T&gt; sideTail;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">GraphNode</span><span class="params">(T value)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.value = value;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> T <span class="title">getValue</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> value;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> GraphSide&lt;T&gt; <span class="title">getSide</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> sideHead;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> GraphNode&lt;T&gt; <span class="title">side</span><span class="params">(<span class="keyword">int</span> priority, GraphNode&lt;T&gt; node)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.addSide(<span class="keyword">new</span> GraphSide&lt;T&gt;(priority, node));</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">this</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">addSide</span><span class="params">(GraphSide&lt;T&gt; side)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (side.getPriority() &lt; <span class="number">0</span>) &#123;</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> IllegalStateException(<span class="string">"priority &lt; 0"</span>);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">if</span> (sideHead == <span class="keyword">null</span>) &#123;</span><br><span class="line">            sideHead = side;</span><br><span class="line">            sideTail = sideHead;</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            sideTail.next = side;</span><br><span class="line">            sideTail = side;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">toString</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> String.format(<span class="string">"[%s]"</span>, value);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>图的边：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment">    * 图的边</span></span><br><span class="line"><span class="comment">    */</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">GraphSide</span>&lt;<span class="title">T</span>&gt; </span>&#123;</span><br><span class="line">    <span class="comment">// 权重</span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">int</span> priority;</span><br><span class="line">    <span class="comment">// 下一条边</span></span><br><span class="line">    <span class="keyword">private</span> GraphSide&lt;T&gt; next;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> GraphNode&lt;T&gt; node;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">GraphSide</span><span class="params">(<span class="keyword">int</span> priority, GraphNode&lt;T&gt; node)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.priority = priority;</span><br><span class="line">        <span class="keyword">this</span>.node = node;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> GraphSide&lt;T&gt; <span class="title">getNext</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> next;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> GraphNode&lt;T&gt; <span class="title">getNode</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> node;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">getPriority</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> priority;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="Dijkstra算法"><a href="#Dijkstra算法" class="headerlink" title="Dijkstra算法"></a>Dijkstra算法</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> &lt;T&gt; Map&lt;GraphNode&lt;T&gt;, Integer&gt; dijkstra(GraphNode&lt;T&gt; root) &#123;</span><br><span class="line">    Map&lt;GraphNode&lt;T&gt;, Integer&gt; distances = <span class="keyword">new</span> HashMap&lt;&gt;();</span><br><span class="line"></span><br><span class="line">    Deque&lt;GraphNode&lt;T&gt;&gt; queue = <span class="keyword">new</span> LinkedList&lt;&gt;();</span><br><span class="line"></span><br><span class="line">    queue.offerLast(root);</span><br><span class="line">    distances.put(root, <span class="number">0</span>);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">while</span> (queue.size() &gt; <span class="number">0</span>) &#123;</span><br><span class="line">        GraphNode&lt;T&gt; fromNode = queue.pollFirst();</span><br><span class="line">        GraphSide&lt;T&gt; side = fromNode.getSide();</span><br><span class="line">        <span class="keyword">while</span> (side != <span class="keyword">null</span>) &#123;</span><br><span class="line">            <span class="keyword">int</span> priority = side.getPriority();</span><br><span class="line"></span><br><span class="line">            <span class="keyword">int</span> newDistance = distances.get(fromNode) + priority;</span><br><span class="line"></span><br><span class="line">            GraphNode&lt;T&gt; toNode = side.getNode();</span><br><span class="line">            <span class="keyword">if</span> (distances.get(toNode) == <span class="keyword">null</span>) &#123;</span><br><span class="line">                <span class="comment">// 第一次到达时</span></span><br><span class="line">                distances.put(toNode, newDistance);</span><br><span class="line">                queue.offerLast(toNode);</span><br><span class="line">            &#125; <span class="keyword">else</span> <span class="keyword">if</span> (distances.get(toNode) &gt; newDistance) &#123;</span><br><span class="line">                <span class="comment">// 有更近的路径</span></span><br><span class="line">                distances.put(toNode, newDistance);</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            side = side.getNext();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> distances;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>测试:</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">    GraphNode&lt;Integer&gt; n1 = <span class="keyword">new</span> GraphNode&lt;&gt;(<span class="number">1</span>);</span><br><span class="line">    GraphNode&lt;Integer&gt; n2 = <span class="keyword">new</span> GraphNode&lt;&gt;(<span class="number">2</span>);</span><br><span class="line">    GraphNode&lt;Integer&gt; n3 = <span class="keyword">new</span> GraphNode&lt;&gt;(<span class="number">3</span>);</span><br><span class="line">    GraphNode&lt;Integer&gt; n4 = <span class="keyword">new</span> GraphNode&lt;&gt;(<span class="number">4</span>);</span><br><span class="line">    GraphNode&lt;Integer&gt; n5 = <span class="keyword">new</span> GraphNode&lt;&gt;(<span class="number">5</span>);</span><br><span class="line">    GraphNode&lt;Integer&gt; n6 = <span class="keyword">new</span> GraphNode&lt;&gt;(<span class="number">6</span>);</span><br><span class="line">    GraphNode&lt;Integer&gt; n7 = <span class="keyword">new</span> GraphNode&lt;&gt;(<span class="number">7</span>);</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    n1.side(<span class="number">1</span>, n3).side(<span class="number">4</span>, n2).side(<span class="number">1</span>, n5);</span><br><span class="line">    n2.side(<span class="number">2</span>, n4).side(<span class="number">7</span>, n5);</span><br><span class="line">    n3.side(<span class="number">3</span>, n4).side(<span class="number">5</span>, n6);</span><br><span class="line">    n4.side(<span class="number">6</span>, n7);</span><br><span class="line">    n5.side(<span class="number">4</span>, n7);</span><br><span class="line">    n6.side(<span class="number">2</span>, n7);</span><br><span class="line"></span><br><span class="line">    Map&lt;GraphNode&lt;Integer&gt;, Integer&gt; distance = dijkstra(n1);</span><br><span class="line"></span><br><span class="line">    distance.forEach((node, dis)-&gt;&#123;</span><br><span class="line">        System.out.println(String.format(<span class="string">"from node n1 to node %s,dis is: %s"</span>, node, dis));</span><br><span class="line">    &#125;);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>输出：</p>
+<figure class="highlight crmsh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">from <span class="keyword">node</span> <span class="title">n1</span> to <span class="keyword">node</span> <span class="title">[3</span>],dis is: <span class="number">1</span></span><br><span class="line">from <span class="keyword">node</span> <span class="title">n1</span> to <span class="keyword">node</span> <span class="title">[4</span>],dis is: <span class="number">4</span></span><br><span class="line">from <span class="keyword">node</span> <span class="title">n1</span> to <span class="keyword">node</span> <span class="title">[7</span>],dis is: <span class="number">5</span></span><br><span class="line">from <span class="keyword">node</span> <span class="title">n1</span> to <span class="keyword">node</span> <span class="title">[5</span>],dis is: <span class="number">1</span></span><br><span class="line">from <span class="keyword">node</span> <span class="title">n1</span> to <span class="keyword">node</span> <span class="title">[6</span>],dis is: <span class="number">6</span></span><br><span class="line">from <span class="keyword">node</span> <span class="title">n1</span> to <span class="keyword">node</span> <span class="title">[1</span>],dis is: <span class="number">0</span></span><br><span class="line">from <span class="keyword">node</span> <span class="title">n1</span> to <span class="keyword">node</span> <span class="title">[2</span>],dis is: <span class="number">4</span></span><br></pre></td></tr></table></figure>
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://cuishibing.github.io/2020/07/23/%E5%8D%95%E6%BA%90%E6%9C%80%E7%9F%AD%E8%B7%AF%E5%BE%84%EF%BC%88Dijkstra%EF%BC%89/" data-id="ckcywwpm5000d8kvoe2rs8h6r" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E7%AE%97%E6%B3%95/" rel="tag">算法</a></li></ul>
+
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+  
+    <a href="/2020/07/20/%E4%BA%8C%E5%8F%89%E6%A0%91%E7%9A%84%E9%81%8D%E5%8E%86/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">二叉树的遍历</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">标签云</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/Hadoop/" style="font-size: 10px;">Hadoop</a> <a href="/tags/Hexo/" style="font-size: 10px;">Hexo</a> <a href="/tags/Linux/" style="font-size: 20px;">Linux</a> <a href="/tags/Other/" style="font-size: 10px;">Other</a> <a href="/tags/Redis/" style="font-size: 10px;">Redis</a> <a href="/tags/%E6%83%B3%E6%B3%95/" style="font-size: 10px;">想法</a> <a href="/tags/%E7%AE%97%E6%B3%95/" style="font-size: 20px;">算法</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">最新文章</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2020/07/23/%E5%8D%95%E6%BA%90%E6%9C%80%E7%9F%AD%E8%B7%AF%E5%BE%84%EF%BC%88Dijkstra%EF%BC%89/">单源最短路径（Dijkstra）</a>
+          </li>
+        
+          <li>
+            <a href="/2020/07/20/%E4%BA%8C%E5%8F%89%E6%A0%91%E7%9A%84%E9%81%8D%E5%8E%86/">二叉树的遍历</a>
+          </li>
+        
+          <li>
+            <a href="/2020/07/14/Windows-Powere-Shell%E6%97%A0%E6%B3%95%E6%89%A7%E8%A1%8C%E8%84%9A%E6%9C%AC/">Windows Powere Shell无法执行脚本</a>
+          </li>
+        
+          <li>
+            <a href="/2020/06/27/Docker%E4%B8%AD%E6%90%AD%E5%BB%BAhadoop%E9%9B%86%E7%BE%A4/">Docker中搭建hadoop集群</a>
+          </li>
+        
+          <li>
+            <a href="/2020/06/07/hexo%E5%9B%BE%E7%89%87%E9%97%AE%E9%A2%98/">hexo图片问题</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2020 Cuishibing<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+
+  
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+
+
+<script src="/js/script.js"></script>
+
+
+
+
+  </div>
+</body>
+</html>

@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+
+  
+  <title>二叉树的遍历 | Cuishibing</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="二叉树的遍历方法基本分为：  深度优先 广度优先  其中深度优先根据根节点处理顺序的不同分为:  前序遍历 中序遍历 后序遍历   前序遍历根节点在子节点之前被处理，使用递归方法很容易，下面记录一下非递归方法。递归方法都能改写为非递归方法（有时候是很难的），使用递归方法时是由编译器来处理栈的参数，改写后就是我们手动处理栈相关的操作。非递归代码:">
+<meta property="og:type" content="article">
+<meta property="og:title" content="二叉树的遍历">
+<meta property="og:url" content="https://cuishibing.github.io/2020/07/20/%E4%BA%8C%E5%8F%89%E6%A0%91%E7%9A%84%E9%81%8D%E5%8E%86/index.html">
+<meta property="og:site_name" content="Cuishibing">
+<meta property="og:description" content="二叉树的遍历方法基本分为：  深度优先 广度优先  其中深度优先根据根节点处理顺序的不同分为:  前序遍历 中序遍历 后序遍历   前序遍历根节点在子节点之前被处理，使用递归方法很容易，下面记录一下非递归方法。递归方法都能改写为非递归方法（有时候是很难的），使用递归方法时是由编译器来处理栈的参数，改写后就是我们手动处理栈相关的操作。非递归代码:">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2020-07-20T10:04:05.000Z">
+<meta property="article:modified_time" content="2020-07-23T14:49:29.832Z">
+<meta property="article:author" content="Cuishibing">
+<meta property="article:tag" content="算法">
+<meta name="twitter:card" content="summary">
+  
+    <link rel="alternate" href="/atom.xml" title="Cuishibing" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+
+<meta name="generator" content="Hexo 4.2.1"></head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Cuishibing</a>
+      </h1>
+      
+        <h2 id="subtitle-wrap">
+          <a href="/" id="subtitle">想不到好名字</a>
+        </h2>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="搜索"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="https://cuishibing.github.io"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-二叉树的遍历" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2020/07/20/%E4%BA%8C%E5%8F%89%E6%A0%91%E7%9A%84%E9%81%8D%E5%8E%86/" class="article-date">
+  <time datetime="2020-07-20T10:04:05.000Z" itemprop="datePublished">2020-07-20</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      二叉树的遍历
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>二叉树的遍历方法基本分为：</p>
+<ul>
+<li>深度优先</li>
+<li>广度优先</li>
+</ul>
+<p>其中深度优先根据根节点处理顺序的不同分为:</p>
+<ul>
+<li>前序遍历</li>
+<li>中序遍历</li>
+<li>后序遍历</li>
+</ul>
+<hr>
+<h2 id="前序遍历"><a href="#前序遍历" class="headerlink" title="前序遍历"></a>前序遍历</h2><p>根节点在子节点之前被处理，使用递归方法很容易，下面记录一下非递归方法。<br><strong>递归方法都能改写为非递归方法（有时候是很难的），使用递归方法时是由编译器来处理栈的参数，改写后就是我们手动处理栈相关的操作。</strong><br>非递归代码:</p>
+<a id="more"></a>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> List&lt;TreeNode&gt; <span class="title">preOrderTraverse</span><span class="params">(TreeNode root)</span> </span>&#123;</span><br><span class="line">    List&lt;TreeNode&gt; traverse = <span class="keyword">new</span> ArrayList&lt;&gt;();</span><br><span class="line"></span><br><span class="line">    Deque&lt;TreeNode&gt; stack = <span class="keyword">new</span> LinkedList&lt;&gt;();</span><br><span class="line">    TreeNode curNode = root;</span><br><span class="line">    <span class="keyword">while</span> (curNode != <span class="keyword">null</span>) &#123;</span><br><span class="line">        <span class="comment">// 先处理根节点（这里curNode就是根节点）</span></span><br><span class="line">        traverse.add(curNode);</span><br><span class="line">        stack.offerLast(curNode);</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 这里其实是处理根节点的左节点</span></span><br><span class="line">        curNode = curNode.left;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">while</span> (curNode == <span class="keyword">null</span> &amp;&amp; stack.size() != <span class="number">0</span>) &#123;</span><br><span class="line">            TreeNode node = stack.pollLast();</span><br><span class="line">            <span class="keyword">if</span> (node.right != <span class="keyword">null</span>) &#123;</span><br><span class="line">                <span class="comment">// 处理右节点</span></span><br><span class="line">                curNode = node.right;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> traverse;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>看起来更直观的写法：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> List&lt;TreeNode&gt; <span class="title">preOrderTraverse</span><span class="params">(TreeNode root)</span> </span>&#123;</span><br><span class="line">    List&lt;TreeNode&gt; traverse = <span class="keyword">new</span> ArrayList&lt;&gt;();</span><br><span class="line"></span><br><span class="line">    Deque&lt;TreeNode&gt; stack = <span class="keyword">new</span> LinkedList&lt;&gt;();</span><br><span class="line">    stack.offerLast(root);</span><br><span class="line">    <span class="keyword">while</span> (stack.size() != <span class="number">0</span>) &#123;</span><br><span class="line">        TreeNode node = stack.pollLast();</span><br><span class="line">        traverse.add(node);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (node.right != <span class="keyword">null</span>) &#123;</span><br><span class="line">            stack.offerLast(node.right);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">if</span> (node.left != <span class="keyword">null</span>) &#123;</span><br><span class="line">            stack.offerLast(node.left);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> traverse;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="中序遍历"><a href="#中序遍历" class="headerlink" title="中序遍历"></a>中序遍历</h2><p>根节点在子节点之间被处理<br>非递归代码：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> List&lt;TreeNode&gt; <span class="title">middleOrderTraverse</span><span class="params">(TreeNode root)</span> </span>&#123;</span><br><span class="line">    List&lt;TreeNode&gt; traverse = <span class="keyword">new</span> ArrayList&lt;&gt;();</span><br><span class="line"></span><br><span class="line">    Deque&lt;TreeNode&gt; stack = <span class="keyword">new</span> LinkedList&lt;&gt;();</span><br><span class="line">    TreeNode curNode = root;</span><br><span class="line">    <span class="keyword">while</span> (curNode != <span class="keyword">null</span>) &#123;</span><br><span class="line">        stack.offerLast(curNode);</span><br><span class="line">        <span class="comment">// 处理左节点</span></span><br><span class="line">        curNode = curNode.left;</span><br><span class="line">        <span class="keyword">while</span> (curNode == <span class="keyword">null</span> &amp;&amp; stack.size() != <span class="number">0</span>) &#123;</span><br><span class="line">            TreeNode node = stack.pollLast();</span><br><span class="line">            <span class="comment">// 处理根节点</span></span><br><span class="line">            traverse.add(node);</span><br><span class="line"></span><br><span class="line">            <span class="keyword">if</span> (node.right != <span class="keyword">null</span>) &#123;</span><br><span class="line">                <span class="comment">// 处理右节点</span></span><br><span class="line">                curNode = node.right;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> traverse;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="后序遍历"><a href="#后序遍历" class="headerlink" title="后序遍历"></a>后序遍历</h2><p>根节点在子节点之后被处理<br>非递归代码：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> List&lt;TreeNode&gt; <span class="title">postOrderTraverse</span><span class="params">(TreeNode root)</span> </span>&#123;</span><br><span class="line">    TreeNode lastVisitNode = <span class="keyword">null</span>;</span><br><span class="line"></span><br><span class="line">    List&lt;TreeNode&gt; traverse = <span class="keyword">new</span> ArrayList&lt;&gt;();</span><br><span class="line">    Deque&lt;TreeNode&gt; stack = <span class="keyword">new</span> LinkedList&lt;&gt;();</span><br><span class="line">    TreeNode curNode = root;</span><br><span class="line">    <span class="keyword">while</span> (curNode != <span class="keyword">null</span>) &#123;</span><br><span class="line">        stack.offerLast(curNode);</span><br><span class="line">        <span class="comment">// 处理左节点</span></span><br><span class="line">        curNode = curNode.left;</span><br><span class="line">        <span class="keyword">while</span> (curNode == <span class="keyword">null</span> &amp;&amp; stack.size() != <span class="number">0</span>) &#123;</span><br><span class="line">            TreeNode node = stack.peekLast();</span><br><span class="line">            </span><br><span class="line">            <span class="comment">/**</span></span><br><span class="line"><span class="comment">            后序遍历时栈回退时需要知道节点是否已经被处理过，这里用一个遍历记录最后一次访问的节点</span></span><br><span class="line"><span class="comment">            当node.right == lastVisitNode时说明该节点的左右节点都已经被访问过，此时应该访问该节点</span></span><br><span class="line"><span class="comment">            */</span></span><br><span class="line">            <span class="keyword">if</span> (node.right != <span class="keyword">null</span> &amp;&amp; node.right != lastVisitNode) &#123;</span><br><span class="line">                <span class="comment">// 处理右节点</span></span><br><span class="line">                curNode = node.right;</span><br><span class="line">            &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                lastVisitNode = stack.pollLast();</span><br><span class="line">                <span class="comment">// 根节点</span></span><br><span class="line">                traverse.add(lastVisitNode);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> traverse;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>前中后三种遍历方法的代码结构是一样的（不包括前序的第二种写法），在处理根节点的访问时存在不同。</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://cuishibing.github.io/2020/07/20/%E4%BA%8C%E5%8F%89%E6%A0%91%E7%9A%84%E9%81%8D%E5%8E%86/" data-id="ckcywwpm4000b8kvo0vbh9vtl" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E7%AE%97%E6%B3%95/" rel="tag">算法</a></li></ul>
+
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2020/07/23/%E5%8D%95%E6%BA%90%E6%9C%80%E7%9F%AD%E8%B7%AF%E5%BE%84%EF%BC%88Dijkstra%EF%BC%89/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          单源最短路径（Dijkstra）
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2020/07/14/Windows-Powere-Shell%E6%97%A0%E6%B3%95%E6%89%A7%E8%A1%8C%E8%84%9A%E6%9C%AC/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">Windows Powere Shell无法执行脚本</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">标签云</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/Hadoop/" style="font-size: 10px;">Hadoop</a> <a href="/tags/Hexo/" style="font-size: 10px;">Hexo</a> <a href="/tags/Linux/" style="font-size: 20px;">Linux</a> <a href="/tags/Other/" style="font-size: 10px;">Other</a> <a href="/tags/Redis/" style="font-size: 10px;">Redis</a> <a href="/tags/%E6%83%B3%E6%B3%95/" style="font-size: 10px;">想法</a> <a href="/tags/%E7%AE%97%E6%B3%95/" style="font-size: 20px;">算法</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">最新文章</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2020/07/23/%E5%8D%95%E6%BA%90%E6%9C%80%E7%9F%AD%E8%B7%AF%E5%BE%84%EF%BC%88Dijkstra%EF%BC%89/">单源最短路径（Dijkstra）</a>
+          </li>
+        
+          <li>
+            <a href="/2020/07/20/%E4%BA%8C%E5%8F%89%E6%A0%91%E7%9A%84%E9%81%8D%E5%8E%86/">二叉树的遍历</a>
+          </li>
+        
+          <li>
+            <a href="/2020/07/14/Windows-Powere-Shell%E6%97%A0%E6%B3%95%E6%89%A7%E8%A1%8C%E8%84%9A%E6%9C%AC/">Windows Powere Shell无法执行脚本</a>
+          </li>
+        
+          <li>
+            <a href="/2020/06/27/Docker%E4%B8%AD%E6%90%AD%E5%BB%BAhadoop%E9%9B%86%E7%BE%A4/">Docker中搭建hadoop集群</a>
+          </li>
+        
+          <li>
+            <a href="/2020/06/07/hexo%E5%9B%BE%E7%89%87%E9%97%AE%E9%A2%98/">hexo图片问题</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2020 Cuishibing<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+
+  
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+
+
+<script src="/js/script.js"></script>
+
+
+
+
+  </div>
+</body>
+</html>
