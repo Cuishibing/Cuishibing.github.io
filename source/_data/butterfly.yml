@@ -160,7 +160,7 @@ wordcount:
 # 3: auto_excerpt (default)
 index_post_content:
   method: 3
-  length: 500 # if you set method to 2 or 3, the length need to config
+  length: 50 # if you set method to 2 or 3, the length need to config
 
 # Post
 # --------------------------------------
@@ -693,7 +693,7 @@ snackbar:
   bg_dark: '#121212' # The background color of Toast Notification in dark mode
 
 # Baidu Push (百度推送)
-baidu_push: false
+baidu_push: true
 
 # https://instant.page/
 # prefetch (預加載)
