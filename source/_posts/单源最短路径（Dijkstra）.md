@@ -3,8 +3,13 @@ title: 单源最短路径（Dijkstra）
 date: 2020-07-23 21:21:10
 tags: 算法
 ---
+## 前言
 首先可以回顾一下图的表示，参考{% post_link 图的邻接表表示 %}
-<!-- more -->
+- 什么是单源最短路径
+从一个顶点到所有顶点的最短路径
+- Dijkstra算法的局限
+Dijkstra算法只适用于无负权的图
+
 ## Dijkstra算法求单源最短路径
 ````java
 public static <T> Map<GraphNode<T>, Integer> dijkstra(GraphNode<T> root) {
@@ -39,7 +44,7 @@ public static <T> Map<GraphNode<T>, Integer> dijkstra(GraphNode<T> root) {
     return distances;
 }
 ````
-测试:
+## 测试
 首先构造这样一个图:
 ![](./tu.png)
 ````java
@@ -67,7 +72,7 @@ public static void main(String[] args) {
     });
 }
 ````
-输出：
+## 输出
 ````log
 from node [1] to node [3], distance is: 1
 from node [1] to node [4], distance is: 4

@@ -54,8 +54,8 @@ tags: Hadoop
     apt install openjdk-8-jdk
 ````
 下载完成后配置JAVA_HOME等环境变量
-#### 配置hadoop
-##### core-site.xml
+### 配置hadoop
+#### core-site.xml
 ````xml
   <property>
     <name>hadoop.http.staticuser.user</name>
@@ -67,7 +67,7 @@ tags: Hadoop
   </property>
 ````
 其中`fs.defaultFS`参数为hadoop的`name node`节点的地址和端口，hadoop的name node负责整个集群的元数据信息。比如：访问一个文件，只有name node知道该文件的基本信息，以及存储在哪些data node中。data node也会定期向name node汇报自身的信息。
-##### hadoop-env.sh
+#### hadoop-env.sh
 配置日志地址，默认日志地址在安装目录下
 ````shell
 export HADOOP_LOG_DIR=/root/logs/hadoop
@@ -76,7 +76,7 @@ export HADOOP_LOG_DIR=/root/logs/hadoop
 ````shell
 export JAVA_HOME="/usr/lib/jvm/java-8-openjdk-amd64"
 ````
-##### hdfs-site.xml
+#### hdfs-site.xml
 ````xml
 <configuration>
   <property>
@@ -85,7 +85,7 @@ export JAVA_HOME="/usr/lib/jvm/java-8-openjdk-amd64"
   </property>
 </configuration>
 ````
-##### mapred-site.xml
+#### mapred-site.xml
 ````xml
 <configuration>
   <!-- 下面两个参数是为了使用yarn执行job需要配置的 -->
@@ -99,7 +99,7 @@ export JAVA_HOME="/usr/lib/jvm/java-8-openjdk-amd64"
   </property>
 </configuration>
 ````
-##### yarn-site.xml
+#### yarn-site.xml
 ````xml
 <configuration>
   <!-- 配置resourcemanager的ip和地址，这里我把namenode和yarn部署在同一个节点上，所以写的是namenode的host -->
@@ -117,7 +117,7 @@ export JAVA_HOME="/usr/lib/jvm/java-8-openjdk-amd64"
   </property>
 </configuration>
 ````
-##### start-dfs.sh,stop-dfs.sh,start-yarn.sh,stop-yarn.sh
+#### start-dfs.sh,stop-dfs.sh,start-yarn.sh,stop-yarn.sh
 因为我全程使用root账户操作，所以这四个脚本里需要配置下面的变量，默认情况下是使用hdfs用户
 ````shell
 HDFS_DATANODE_USER=root
@@ -125,12 +125,12 @@ HADOOP_SECURE_DN_USER=hdfs
 HDFS_NAMENODE_USER=root
 HDFS_SECONDARYNAMENODE_USER=root
 ````
-##### hdfs
+#### hdfs
 同样是因为使用root账户操作的原因
 ````shell
 HADOOP_SHELL_EXECNAME="root" //生产环境不要这样做
 ````
-##### /etc/profile
+#### /etc/profile
 pdsh默认采用的是rsh登录，修改成ssh登录
 ````shell
 export PDSH_RCMD_TYPE=ssh
