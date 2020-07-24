@@ -3,89 +3,9 @@ title: 单源最短路径（Dijkstra）
 date: 2020-07-23 21:21:10
 tags: 算法
 ---
-## 图的邻接表表示
+首先可以回顾一下图的表示，参考{% post_link 图的邻接表表示 %}
 <!-- more -->
-图的节点:
-````java
-/**
-* 图的节点
-*/
-public static class GraphNode<T> {
-    private T value;
-    // 一条边
-    private GraphSide<T> sideHead;
-
-    // 最后一条边
-    private GraphSide<T> sideTail;
-
-    public GraphNode(T value) {
-        this.value = value;
-    }
-
-    public T getValue() {
-        return value;
-    }
-
-    public GraphSide<T> getSide() {
-        return sideHead;
-    }
-
-    public GraphNode<T> side(int priority, GraphNode<T> node) {
-        this.addSide(new GraphSide<T>(priority, node));
-        return this;
-    }
-
-    public void addSide(GraphSide<T> side) {
-        if (side.getPriority() < 0) {
-            throw new IllegalStateException("priority < 0");
-        }
-        if (sideHead == null) {
-            sideHead = side;
-            sideTail = sideHead;
-        } else {
-            sideTail.next = side;
-            sideTail = side;
-        }
-    }
-
-    @Override
-    public String toString() {
-        return String.format("[%s]", value);
-    }
-}
-````
-图的边：
-````java
-/**
-    * 图的边
-    */
-public static class GraphSide<T> {
-    // 权重
-    private int priority;
-    // 下一条边
-    private GraphSide<T> next;
-
-    private GraphNode<T> node;
-
-    public GraphSide(int priority, GraphNode<T> node) {
-        this.priority = priority;
-        this.node = node;
-    }
-
-    public GraphSide<T> getNext() {
-        return next;
-    }
-
-    public GraphNode<T> getNode() {
-        return node;
-    }
-
-    public int getPriority() {
-        return priority;
-    }
-}
-````
-## Dijkstra算法
+## Dijkstra算法求单源最短路径
 ````java
 public static <T> Map<GraphNode<T>, Integer> dijkstra(GraphNode<T> root) {
     Map<GraphNode<T>, Integer> distances = new HashMap<>();
@@ -120,6 +40,8 @@ public static <T> Map<GraphNode<T>, Integer> dijkstra(GraphNode<T> root) {
 }
 ````
 测试:
+首先构造这样一个图:
+![](./tu.png)
 ````java
 public static void main(String[] args) {
     GraphNode<Integer> n1 = new GraphNode<>(1);
@@ -141,17 +63,17 @@ public static void main(String[] args) {
     Map<GraphNode<Integer>, Integer> distance = dijkstra(n1);
 
     distance.forEach((node, dis)->{
-        System.out.println(String.format("from node n1 to node %s,dis is: %s", node, dis));
+        System.out.println(String.format("from node %s to node %s, distance is: %s",n1, node, dis));
     });
 }
 ````
 输出：
-````
-from node n1 to node [3],dis is: 1
-from node n1 to node [4],dis is: 4
-from node n1 to node [7],dis is: 5
-from node n1 to node [5],dis is: 1
-from node n1 to node [6],dis is: 6
-from node n1 to node [1],dis is: 0
-from node n1 to node [2],dis is: 4
+````log
+from node [1] to node [3], distance is: 1
+from node [1] to node [4], distance is: 4
+from node [1] to node [7], distance is: 5
+from node [1] to node [5], distance is: 1
+from node [1] to node [6], distance is: 6
+from node [1] to node [1], distance is: 0
+from node [1] to node [2], distance is: 4
 ````
