@@ -1,12 +1,30 @@
 <div>
-   
-    <button onclick="goIdeas()">想法</button>
-    <button>算法</button>
-    <button>设计模式</button>
- 
+
+    <div id="category_btn_group">
+        <button data-target="idea_list">想法</button>
+        <button data-target="arithmetic_list">算法</button>
+        <button data-target="design_list">设计模式</button>
+    </div>
+
+    <div id="category_target_stub">
+
+    </div>
+
     <script>
-        function goIdeas() {
-            document.querySelector("#idea_list").style.display = "inherit"
-        }
+        let category_btn_group = document.querySelector("#category_btn_group")
+        category_btn_group.querySelectorAll("button").forEach(btn => {
+            btn.onclick = e => {
+                let category_target = btn.dataset.target
+                console.info(category_target)
+
+                let category_target_stub = document.querySelector("#category_target_stub")
+                
+                let include = document.createElement("include")
+                include.setAttribute("id", "category_target_stub")
+                include.setAttribute("src", "/page/category/"+ category_target+".html")
+
+                category_target_stub.parentNode.replaceChild(include, category_target_stub)
+            }
+        })
     </script>
 </div>
