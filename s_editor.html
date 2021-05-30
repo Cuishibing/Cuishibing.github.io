@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <script src="/common.js"></script>
+    <script src="/requestgithub.js"></script>
+    <script src="/gitfunc.js"></script>
+</head>
+
+<body>
+    <div>
+        <include src="/s_header.html"></include>
+        <div id="post_tools_group">
+            <button id="post_edit_btn">编辑</button>
+            <span id="post_edit_tools_group" style="display: none;">
+                <button>标题</button>
+                <button>加粗</button>
+            </span>
+        </div>
+    </div>
+
+    <div id="post_content" style="min-height: 500px;background-color: antiquewhite;">
+
+    </div>
+    <script>
+        let url = window.location.href
+
+        let queryString = url.substr(url.indexOf("?") + 1)
+        let queryParams = queryString.split("&")
+        let target = ""
+        queryParams.forEach(paramKV => {
+            let keyAndValue = paramKV.split("=")
+            if (keyAndValue[0] == "target") {
+                target = keyAndValue[1]
+            }
+        })
+
+        let include = document.createElement("include")
+        include.setAttribute("id", "post_content")
+        include.setAttribute("src", target)
+
+        let post_content = document.querySelector("#post_content")
+
+        for(let i = 0; i<post_content.attributes.length;i++) {
+            let attr = post_content.attributes[i]
+            include.setAttribute(attr.name, attr.value)
+        }
+
+        post_content.parentNode.replaceChild(include, post_content)
+
+
+        // 工具栏固定
+        let post_tools_group = document.getElementById("post_tools_group")
+      
+
+        // 编辑按钮
+        document.getElementById("post_edit_btn").onclick = e => {
+            // 是否编辑状态
+            let post_content = document.getElementById("post_content")
+            if (post_content.getAttribute("contenteditable") == "true") {
+                post_content.setAttribute("contenteditable", false)
+
+                console.info(post_content.innerHTML)
+            } else {
+                post_content.setAttribute("contenteditable", true)
+            }
+
+            // 工具栏显示与隐藏
+            let post_edit_tools_group = document.getElementById("post_edit_tools_group")
+            if (post_edit_tools_group.style.display == "none") {
+                post_edit_tools_group.style.display = ""
+            } else {
+                post_edit_tools_group.style.display = "none"
+            }
+
+            if (e.target.innerHTML == "编辑") {
+                document.getElementById("post_edit_btn").innerHTML = "保存"
+            } else {
+                document.getElementById("post_edit_btn").innerHTML = "编辑"
+            }
+
+            commit({
+                repo:"Cuishibing/Cuishibing.github.io",
+                branch:"master"
+            })
+        }
+
+    </script>
+
+</body>
+
+</html>

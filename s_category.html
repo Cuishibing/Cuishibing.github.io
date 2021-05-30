@@ -1,9 +1,9 @@
 <div>
 
     <div id="category_btn_group">
-        <button data-target="idea_list">想法</button>
-        <button data-target="arithmetic_list">算法</button>
-        <button data-target="design_list">设计模式</button>
+        <button data-target="c_list_idea">想法</button>
+        <button data-target="c_list_arithmetic">算法</button>
+        <button data-target="c_list_design">设计模式</button>
     </div>
 
     <div id="category_target_stub">
@@ -21,7 +21,7 @@
                 
                 let include = document.createElement("include")
                 include.setAttribute("id", "category_target_stub")
-                include.setAttribute("src", "/page/category/"+ category_target+".html")
+                include.setAttribute("src", "/"+ category_target+".html")
 
                 category_target_stub.parentNode.replaceChild(include, category_target_stub)
             }
