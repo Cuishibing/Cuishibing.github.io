@@ -1,3 +1,5 @@
+
+
 /*
 提交文件到github仓库
 param: {
@@ -5,8 +7,7 @@ param: {
     repo: string, // 仓库
     file: {
         path: string, // 文件路径
-        mode: string, // file: 文件，direc: 文件夹
-        content: string, // 文件内容，只有mode是file时生效
+        content: string, // 文件内容
     },
     commitMsg: {
         name: string, // git name
@@ -15,31 +16,71 @@ param: {
     }
 }
  */
-function commit(param) {
+function commitFile(param) {
     let ref = "refs/heads/" + param.branch
+    let file = param.file
+    let repo = param.repo
     // 获取head
     loadRef({
-        repo:param.repo,
-        ref:ref
-    }, (err, xhr, resp)=>{
+        repo: repo,
+        ref: ref
+    }, (err, xhr, resp) => {
         if (err) {
             return
         }
-        let headTreeSha = resp.object.sha
-        console.info("headTreeSha:", headTreeSha)
 
-        // 获取tree
-        loadTree({
-            repo: param.repo,
-            sha: headTreeSha
-        }, (err, xhr, resp)=>{
-            if (err) {
-                return
+        let headCommitSha = resp.object.sha
+        console.info("headCommitSha:", headCommitSha)
+        loadCommit({
+            repo: repo,
+            sha: headCommitSha
+        }, (err, xhr, resp) => {
+            let headTreeSha = resp.tree.sha
+            console.info("headTreeSha:", headTreeSha)
+
+            let updateTree = {
+                tree: [
+                    {
+                        path: file.path,
+                        mode: "100644",
+                        type: "blob",
+                        content: file.content
+                    }
+                ],
+                base_tree: headTreeSha
             }
-            let tree = resp.tree
 
-            console.info("tree:", tree)
+            createTree({
+                repo: repo,
+                data: updateTree
+            }, (err, xhr, resp) => {
+                console.info(resp)
+
+                reqGithub()("POST", "/repos/" + repo + "/git/commits", {
+                    message: "auto commit",
+                    tree: resp.sha,
+                    parents: [headCommitSha],
+                    author: {
+                        name: "Cuishibing",
+                        email: "643237029@qq.com"
+                    }
+                }, (err, xhr, resp) => {
+                    console.info(resp)
+
+                    reqGithub()("PATCH", "/repos/" + repo + "/git/" + ref, {
+                        sha: resp.sha
+                    }, (err, xhr, resp)=>{
+                        console.info(resp)
+                        alert("success")
+                    })
+                })
+            })
+
         })
+
+
+
+
     })
 }
 
@@ -91,13 +132,13 @@ param:{
     sha:string
 }
  */
-function loadCommit(param) {
+function loadCommit(param, callback) {
     let repo = param.repo
     let sha = param.sha
 
     console.info("loadCommit: repo:", repo, "sha:", sha)
     reqGithub()("GET", "/repos/" + repo + "/git/commits/" + sha, null, (err, xhr, resp) => {
-        console.info(resp)
+        callback(err, xhr, resp)
     })
 }
 
@@ -128,12 +169,12 @@ param:{
     }
 }
 */
-function createTree(param) {
+function createTree(param, callback) {
     let repo = param.repo
     let data = param.data
 
     console.info("createTree: repo:", repo, "data:", data)
     reqGithub()("POST", "/repos/" + repo + "/git/trees", data, (err, xhr, resp) => {
-        console.info(resp)
+        callback(err, xhr, resp)
     })
 }
