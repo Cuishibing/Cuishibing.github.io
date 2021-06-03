@@ -2,92 +2,92 @@
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8">
-    <script src="/common.js"></script>
-    <script src="/requestgithub.js"></script>
-    <script src="/gitfunc.js"></script>
-    <script src="/js/md5.min.js"></script>
+<meta charset="UTF-8">
+<script src="/common.js"></script>
+<script src="/requestgithub.js"></script>
+<script src="/gitfunc.js"></script>
+<script src="/js/md5.min.js"></script>
 </head>
 
 <body>
-    <div>
-        <include src="/s_header.html"></include>
-        <div id="post_tools_group">
-            <button id="post_edit_btn">Edit</button>
-            <span>
-                <input type="radio" id="editor_richtext" name="edit_type" value="male" checked>
-                <label for="editor_richtext">As Rish Text</label>
-                <input type="radio" id="editor_rawtext" name="edit_type" value="female">
-                <label for="editor_rawtext">As Raw Text</label>
-            </span>
-        </div>
-    </div>
+<div>
+<include src="/s_header.html"></include>
+<div id="post_tools_group">
+<button id="post_edit_btn">Edit</button>
+<span>
+<input type="radio" id="editor_richtext" name="edit_type" value="male" checked>
+<label for="editor_richtext">As Rish Text</label>
+<input type="radio" id="editor_rawtext" name="edit_type" value="female">
+<label for="editor_rawtext">As Raw Text</label>
+</span>
+</div>
+</div>
 
-    <div id="post_content" style="min-height: 500px; padding:10px;border: solid 1px gray;">
+<div id="post_content" style="min-height: 500px; padding:10px;border: solid 1px gray;">
 
-    </div>
-    <script>
-        let url = window.location.href
+</div>
+<script>
+let url = window.location.href
 
-        let queryString = url.substr(url.indexOf("?") + 1)
-        let queryParams = queryString.split("&")
-        let target = ""
-        queryParams.forEach(paramKV => {
-            let keyAndValue = paramKV.split("=")
-            if (keyAndValue[0] == "target") {
-                target = keyAndValue[1]
-            }
-        })
+let queryString = url.substr(url.indexOf("?") + 1)
+let queryParams = queryString.split("&")
+let target = ""
+queryParams.forEach(paramKV => {
+let keyAndValue = paramKV.split("=")
+if (keyAndValue[0] == "target") {
+target = keyAndValue[1]
+}
+})
 
-        let post_content = document.querySelector("#post_content")
-        reqGithub(window.location.protocol + "//" + window.location.host, "stub")("GET", target, null, (err,xhr, resp)=>{
-            post_content.innerHTML = resp.message
-        })
+let post_content = document.querySelector("#post_content")
+reqGithub(window.location.protocol + "//" + window.location.host, "stub")("GET", target, null, (err,xhr, resp)=>{
+post_content.innerHTML = resp.message
+})
 
-        document.getElementById("editor_richtext").onclick = e=>{
-            reqGithub(window.location.protocol + "//" + window.location.host, "stub")("GET", target, null, (err,xhr, resp)=>{
-                post_content.innerHTML = resp.message
-            })
-        }
+document.getElementById("editor_richtext").onclick = e=>{
+reqGithub(window.location.protocol + "//" + window.location.host, "stub")("GET", target, null, (err,xhr, resp)=>{
+post_content.innerHTML = resp.message
+})
+}
 
-        document.getElementById("editor_rawtext").onclick = e=>{
-            reqGithub(window.location.protocol + "//" + window.location.host, "stub")("GET", target, null, (err,xhr, resp)=>{
-                post_content.innerText = resp.message
-            })
-        }
+document.getElementById("editor_rawtext").onclick = e=>{
+reqGithub(window.location.protocol + "//" + window.location.host, "stub")("GET", target, null, (err,xhr, resp)=>{
+post_content.innerText = resp.message
+})
+}
 
-        
-        // 编辑按钮
-        document.getElementById("post_edit_btn").onclick = e => {
-            // 是否编辑状态
-            let post_content = document.getElementById("post_content")
-            if (post_content.getAttribute("contenteditable") == "true") {
-                post_content.setAttribute("contenteditable", false)
 
-                // 富文本判断
-                let asRichText = document.getElementById("editor_richtext").checked
-                
-                let content = ""
-                if (asRichText) {
-                    content = post_content.outerHTML
-                } else {
-                    content = post_content.innerText
-                }
+// 编辑按钮
+document.getElementById("post_edit_btn").onclick = e => {
+// 是否编辑状态
+let post_content = document.getElementById("post_content")
+if (post_content.getAttribute("contenteditable") == "true") {
+post_content.setAttribute("contenteditable", false)
 
-                
-                commitFile({
-                    branch: "master",
-                    repo: "Cuishibing/Cuishibing.github.io",
-                    file: {
-                        path: decodeURI(target).substr(1),
-                        content: content
-                    }
-                })
-            } else {
-                post_content.setAttribute("contenteditable", true)
-            }
-        }
-    </script>
+// 富文本判断
+let asRichText = document.getElementById("editor_richtext").checked
+
+let content = ""
+if (asRichText) {
+content = post_content.innerHTML
+} else {
+content = post_content.innerText
+}
+
+
+commitFile({
+branch: "master",
+repo: "Cuishibing/Cuishibing.github.io",
+file: {
+path: decodeURI(target).substr(1),
+content: content
+}
+})
+} else {
+post_content.setAttribute("contenteditable", true)
+}
+}
+</script>
 
 </body>
 
