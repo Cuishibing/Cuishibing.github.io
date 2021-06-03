@@ -60,9 +60,11 @@ function parseIncludeTag(target) {
 }
 
 window.addEventListener("load", e => {
+    // from document
     parseIncludeTag(document)
 })
 
 window.addEventListener("DOMNodeInserted", e => {
+    // listen the include tag
     parseIncludeTag(e.target)
 })
