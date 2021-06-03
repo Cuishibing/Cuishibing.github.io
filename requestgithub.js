@@ -40,8 +40,10 @@ function getToken() {
   }
 }
 
-function reqGithub(githubHostname) {
-    let accessToken = getToken()
+function reqGithub(githubHostname, accessToken) {
+    if (!accessToken) {
+      accessToken = getToken()
+    }
     var timeout = 2000;
     githubHostname = (githubHostname || 'https://api.github.com');
     return request;
