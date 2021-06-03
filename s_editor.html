@@ -13,11 +13,17 @@
     <div>
         <include src="/s_header.html"></include>
         <div id="post_tools_group">
-            <button id="post_edit_btn">编辑</button>
+            <button id="post_edit_btn">Edit</button>
+            <span>
+                <input type="radio" id="editor_richtext" name="edit_type" value="male" checked>
+                <label for="editor_richtext">As Rish Text</label>
+                <input type="radio" id="editor_rawtext" name="edit_type" value="female">
+                <label for="editor_rawtext">As Raw Text</label>
+            </span>
         </div>
     </div>
 
-    <div id="post_content" style="min-height: 500px;background-color: antiquewhite;">
+    <div id="post_content" style="min-height: 500px; padding:10px;border: solid 1px gray;">
 
     </div>
     <script>
@@ -46,11 +52,6 @@
 
         post_content.parentNode.replaceChild(include, post_content)
 
-
-        // 工具栏固定
-        let post_tools_group = document.getElementById("post_tools_group")
-
-
         // 编辑按钮
         document.getElementById("post_edit_btn").onclick = e => {
             // 是否编辑状态
@@ -58,15 +59,23 @@
             if (post_content.getAttribute("contenteditable") == "true") {
                 post_content.setAttribute("contenteditable", false)
 
-                console.info(decodeURI(target).substr(1))
-                console.info(post_content.outerHTML)
+                // 富文本判断
+                let asRichText = document.getElementById("editor_richtext").checked
+                
+                let content = ""
+                if (asRichText) {
+                    content = post_content.outerHTML
+                } else {
+                    content = post_content.innerText
+                }
 
+                
                 commitFile({
                     branch: "master",
                     repo: "Cuishibing/Cuishibing.github.io",
                     file: {
                         path: decodeURI(target).substr(1),
-                        content: post_content.outerHTML
+                        content: content
                     }
                 })
             } else {

@@ -24,8 +24,6 @@ function parseIncludeTag(target) {
                 let childBody = e.target.contentDocument.body;
                 let firstNode = childBody.querySelector(":first-child")
 
-                console.info(firstNode)
-
                 for (let index = 0; index < include.attributes.length; index++) {
                     const attr = include.attributes[index];
                     if (attr.name !== "src") {

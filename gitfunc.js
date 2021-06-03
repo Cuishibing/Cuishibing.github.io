@@ -30,13 +30,12 @@ function commitFile(param) {
         }
 
         let headCommitSha = resp.object.sha
-        console.info("headCommitSha:", headCommitSha)
+        
         loadCommit({
             repo: repo,
             sha: headCommitSha
         }, (err, xhr, resp) => {
             let headTreeSha = resp.tree.sha
-            console.info("headTreeSha:", headTreeSha)
 
             let updateTree = {
                 tree: [
@@ -54,7 +53,6 @@ function commitFile(param) {
                 repo: repo,
                 data: updateTree
             }, (err, xhr, resp) => {
-                console.info(resp)
 
                 reqGithub()("POST", "/repos/" + repo + "/git/commits", {
                     message: "auto commit",
@@ -65,12 +63,10 @@ function commitFile(param) {
                         email: "643237029@qq.com"
                     }
                 }, (err, xhr, resp) => {
-                    console.info(resp)
 
                     reqGithub()("PATCH", "/repos/" + repo + "/git/" + ref, {
                         sha: resp.sha
                     }, (err, xhr, resp)=>{
-                        console.info(resp)
                         alert("success")
                     })
                 })
@@ -95,8 +91,6 @@ function loadRef(param, callback) {
     let repo = param.repo
     let ref = param.ref
 
-    console.info("loadRef: repo:", repo, "ref:", ref)
-
     reqGithub()("GET", "/repos/" + repo + "/git/" + ref, null, (err, xhr, resp) => {
         callback(err, xhr, resp)
     })
@@ -119,9 +113,7 @@ function updateRef(param) {
     let ref = param.ref
     let data = param.data
 
-    console.info("updateRef: repo:", repo, "ref:", ref, "data:", data)
     reqGithub()("PATCH", "/repos/" + repo + "/git/refs/" + ref, data, (err, xhr, resp) => {
-        console.info(resp)
     })
 }
 
@@ -136,7 +128,6 @@ function loadCommit(param, callback) {
     let repo = param.repo
     let sha = param.sha
 
-    console.info("loadCommit: repo:", repo, "sha:", sha)
     reqGithub()("GET", "/repos/" + repo + "/git/commits/" + sha, null, (err, xhr, resp) => {
         callback(err, xhr, resp)
     })
@@ -145,7 +136,6 @@ function loadCommit(param, callback) {
 function loadTree(param, callback) {
     let repo = param.repo
     let sha = param.sha
-    console.info("loadTree: repo:", repo, "sha:", sha)
     reqGithub()("GET", "/repos/" + repo + "/git/trees/" + sha, null, (err, xhr, resp) => {
         callback(err, xhr, resp)
     })
@@ -173,7 +163,6 @@ function createTree(param, callback) {
     let repo = param.repo
     let data = param.data
 
-    console.info("createTree: repo:", repo, "data:", data)
     reqGithub()("POST", "/repos/" + repo + "/git/trees", data, (err, xhr, resp) => {
         callback(err, xhr, resp)
     })
