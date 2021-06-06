@@ -1,0 +1,51 @@
+<div>
+
+    <div id="category_btn_group">
+    </div>
+
+    <div id="category_target_stub">
+
+    </div>
+
+    <script type="module">
+        import { req } from "/js/req.js"
+        req("/category/category.json", "GET").then(category => {
+            let categories = category.categories
+            let category_btn_group = document.querySelector("#category_btn_group")
+            categories.forEach(c => {
+                let btn = document.createElement("button")
+                btn.innerText = c.name
+                category_btn_group.appendChild(btn)
+
+                btn.onclick = e => {
+
+                    let category_btns = document.querySelectorAll("#category_btn_group button")
+                    category_btns.forEach(btn => {
+                        btn.classList.remove("selected")
+                    })
+
+                    e.target.classList.add("selected")
+                    let category_target_stub = document.querySelector("#category_target_stub")
+                    category_target_stub.innerHTML = ''
+                    if (!c.post_list) {
+                        return
+                    }
+
+                    c.post_list.forEach(post => {
+                        let h5 = document.createElement("h5")
+                        let a = document.createElement("a")
+                        a.setAttribute("href", "/postview/postview.html?target=" + post.path + "&title=" + post.name)
+                        a.setAttribute("target", "_blank")
+                        a.innerText = post.name
+
+                        h5.appendChild(a)
+
+                        category_target_stub.appendChild(h5)
+                    })
+
+                }
+            })
+        })
+
+    </script>
+</div>

@@ -4,12 +4,17 @@
 
 <head>
     <meta charset="UTF-8">
-    <script src="/common.js"></script>
+    <link href="/css/common.css" rel="stylesheet" type="text/css"/>
+    <script type="module">
+        import {init} from "/js/include.js"
+        init()
+    </script>
+    
 </head>
 
 <body>
-    <include src="/s_header.html"></include>
-    <include src="/s_category.html"></include>
+    <include src="/header/s_header.html"></include>
+    <include src="/category/s_category.html"></include>
 </body>
 
 </html>

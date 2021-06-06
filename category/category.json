@@ -1,0 +1,32 @@
+{
+    "categories":[
+        {
+            "name":"WEB",
+            "post_list":[
+                {
+                    "name":"原生html实现include",
+                    "path":"/posts/原生html实现include.html"
+                },
+                {
+                    "name":"使用GitHub Page实现博客并且可以自动提交",
+                    "path":"/posts/使用GitHub_Page实现博客并且可以自动提交.html"
+                }
+            ]
+        },
+        {
+            "name":"算法"
+        },
+        {
+            "name":"编译原理"
+        },
+        {
+            "name":"Java"
+        },
+        {
+            "name":"操作系统"
+        },
+        {
+            "name":"网络"
+        }
+    ]   
+}

@@ -1,3 +1,4 @@
+import { req } from "/js/req.js"
 // parse custom include tag
 function parseIncludeTag(target) {
     let allIncludeTag = []
@@ -16,13 +17,23 @@ function parseIncludeTag(target) {
         try {
             let src = include.attributes.src.textContent
 
-            let tempIframe = document.createElement("iframe")
-            tempIframe.setAttribute("src", src)
-            tempIframe.style = "display:none"
-            tempIframe.onload = e => {
+            if (!src || src == "") {
+                // 还没有src，设置监听器
+                var options = { attributes: true };
+                let callback = (mutations, observer) => {
+                    console.info("ms", mutations)
+                }
+                var mutationObserver = new MutationObserver(callback);
+                mutationObserver.observe(include, options);
+            }
 
-                let childBody = e.target.contentDocument.body;
-                let firstNode = childBody.querySelector(":first-child")
+            req(src, "GET").then(data => {
+                // console.info(data.message)
+
+                let tempDiv = document.createElement("div")
+                tempDiv.innerHTML = data.message
+
+                let firstNode = tempDiv.querySelector(":first-child")
 
                 for (let index = 0; index < include.attributes.length; index++) {
                     const attr = include.attributes[index];
@@ -35,8 +46,6 @@ function parseIncludeTag(target) {
 
                 parent.replaceChild(firstNode, include)
 
-                parent.removeChild(tempIframe)
-
                 // process script tag
                 let allScripts = firstNode.querySelectorAll("script")
 
@@ -44,12 +53,11 @@ function parseIncludeTag(target) {
                     firstNode.removeChild(script)
 
                     let newScript = document.createElement('script');
-                    newScript.type = 'text/javascript';
+                    newScript.type = script.type
                     newScript.innerHTML = script.innerHTML;
                     firstNode.appendChild(newScript);
                 })
-            }
-            include.parentNode.appendChild(tempIframe)
+            })
         } catch (error) {
             console.error(error)
         }
@@ -57,12 +65,20 @@ function parseIncludeTag(target) {
 
 }
 
-window.addEventListener("load", e => {
-    // from document
-    parseIncludeTag(document)
-})
+const init = function () {
 
-window.addEventListener("DOMNodeInserted", e => {
-    // listen the include tag
-    parseIncludeTag(e.target)
-})
+    window.addEventListener("load", e => {
+        // from document
+        parseIncludeTag(document)
+    })
+
+    window.addEventListener("DOMNodeInserted", e => {
+        // listen the include tag
+        parseIncludeTag(e.target)
+    })
+
+}
+
+export {
+    init
+}

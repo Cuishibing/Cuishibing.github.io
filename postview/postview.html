@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <link href="/css/common.css" rel="stylesheet" type="text/css" />
+    <script type="module">
+        import { init } from "/js/include.js"
+        init()
+    </script>
+</head>
+
+<body>
+    <include src="/header/s_header.html"></include>
+    <div>
+        <h2 id="post_title"></h2>
+    </div>
+    <div id="post_content" style="border-left: solid 2px black; padding-left: 5px;line-height:25px;">
+
+    </div>
+    <br />
+    <div>
+        <label>显示模式：</label>
+        <select id="post_show_type">
+            <option value="rich">Rich Text</option>
+            <option value="raw">Raw Text</option>
+        </select>
+        <button onclick="onEdit">编辑</button>
+    </div>
+    <script type="module">
+        import { req } from "/js/req.js"
+        let url = window.location.href
+        let queryString = url.substr(url.indexOf("?") + 1)
+        let queryParams = queryString.split("&")
+        let target = ""
+        let title = ""
+        queryParams.forEach(paramKV => {
+            let keyAndValue = paramKV.split("=")
+            if (keyAndValue[0] == "target") {
+                target = keyAndValue[1]
+            }
+            if (keyAndValue[0] == "title") {
+                title = keyAndValue[1]
+            }
+
+        })
+
+        document.getElementById("post_title").innerText = decodeURI(title)
+
+        function loadContent(showType) {
+            if (!showType) {
+                showType = "rich"
+            }
+            let post_content = document.querySelector("#post_content")
+            if (target && target != "") {
+                req(target, "GET").then(data => {
+                    data.message = data.message.replaceAll("\n", "<br/>")
+                    data.message = data.message.replaceAll("\t", "&nbsp;&nbsp;&nbsp;&nbsp;")
+                    if (showType == "rich"){
+                        post_content.innerHTML = data.message
+                    }
+                    if (showType == "raw") {
+                        post_content.innerText = data.message
+                    }
+                })
+            }
+        }
+        loadContent()
+
+
+        // control
+        document.getElementById("post_show_type").onchange = showTypeChange
+        function showTypeChange(e){
+            if (e.target.value == "raw") {
+                loadContent("raw")
+            } else if (e.target.value == "rich") {
+                loadContent("rich")
+            }
+        }
+    </script>
+
+</body>
+
+</html>
