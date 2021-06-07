@@ -57,7 +57,7 @@ class Github {
         console.info(createCommitResult)
 
         // call api update ref
-        this.updateRef("heads/master", createCommitResult.sha)
+        return await this.updateRef("heads/master", createCommitResult.sha)
     }
 
     _createTree(path, content) {

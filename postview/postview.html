@@ -4,6 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <link href="/css/common.css" rel="stylesheet" type="text/css" />
+    <script src="/js/md5.min.js"></script>
     <script type="module">
         import { init } from "/js/include.js"
         init()
@@ -29,6 +30,9 @@
     </div>
     <script type="module">
         import { req } from "/js/req.js"
+        import { getToken } from "/js/token.js"
+        import { Github } from "/js/github.js"
+
         let url = window.location.href
         let queryString = url.substr(url.indexOf("?") + 1)
         let queryParams = queryString.split("&")
@@ -89,8 +93,29 @@
                 e.target.innerText = "编辑"
                 post_content.setAttribute("contenteditable", false)
 
-                let passwd = prompt("确定要保存嘛?请输入密码：","")
-                console.info(passwd)
+                let token = getToken()
+                if (!token) {
+                    alert("密码错误")
+                    return
+                }
+
+                let showType = document.getElementById("post_show_type").value
+                console.info(showType)
+                let content = "";
+                if (showType == "rich") {
+                    content = post_content.innerHTML
+                } else {
+                    content = post_content.innerText
+                }
+
+                let github = new Github("Cuishibing/Cuishibing.github.io", token)
+                github.commitFile([
+                    {
+                        path: decodeURI(target),
+                        content: content,
+                    }
+                ])
+
             } else {
                 e.target.innerText = "保存"
                 post_content.setAttribute("contenteditable", true)
