@@ -25,7 +25,7 @@
             <option value="rich">Rich Text</option>
             <option value="raw">Raw Text</option>
         </select>
-        <button onclick="onEdit">编辑</button>
+        <button id="post_edit_btn">编辑</button>
     </div>
     <script type="module">
         import { req } from "/js/req.js"
@@ -56,7 +56,7 @@
                 req(target, "GET").then(data => {
                     data.message = data.message.replaceAll("\n", "<br/>")
                     data.message = data.message.replaceAll("\t", "&nbsp;&nbsp;&nbsp;&nbsp;")
-                    if (showType == "rich"){
+                    if (showType == "rich") {
                         post_content.innerHTML = data.message
                     }
                     if (showType == "raw") {
@@ -70,11 +70,31 @@
 
         // control
         document.getElementById("post_show_type").onchange = showTypeChange
-        function showTypeChange(e){
+        function showTypeChange(e) {
             if (e.target.value == "raw") {
                 loadContent("raw")
             } else if (e.target.value == "rich") {
                 loadContent("rich")
+            }
+        }
+
+        // edit_btn
+        document.getElementById("post_edit_btn").onclick = editBtnOnclick
+        function editBtnOnclick(e) {
+            let post_content = document.getElementById("post_content")
+
+            let contenteditable = post_content.getAttribute("contenteditable")
+
+            if (contenteditable == "true") {
+                e.target.innerText = "编辑"
+                post_content.setAttribute("contenteditable", false)
+
+                let passwd = prompt("确定要保存嘛?请输入密码：","")
+                console.info(passwd)
+            } else {
+                e.target.innerText = "保存"
+                post_content.setAttribute("contenteditable", true)
+                post_content.focus()
             }
         }
     </script>

@@ -4,8 +4,7 @@ class Github {
     constructor(repo, token) {
         this.apihost = 'https://api.github.com';
         this.repo = repo
-        // this.token = token,
-        this.token = "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"
+        this.token = token
     }
 
     /**
