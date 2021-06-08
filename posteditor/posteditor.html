@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <link href="/css/common.css" rel="stylesheet" type="text/css" />
+    <script src="/js/md5.min.js"></script>
+    <script type="module">
+        import { init } from "/js/include.js"
+        init()
+    </script>
+</head>
+
+<body>
+    <include src="/header/s_header.html"></include>
+
+    <span>
+        <label>标题：</label>
+        <input id="post_title" placeholder="输入标题" />
+
+        <label>类型：</label>
+        <input id="post_category" placeholder="输入类型" />
+    </span>
+
+    <span>
+        <select id="edit_title">
+            <option value="0">正文</option>
+            <option value="1">一级标题</option>
+            <option value="2">二级标题</option>
+            <option value="3">三级标题</option>
+            <option value="4">四级标题</option>
+            <option value="5">五级标题</option>
+        </select>
+        <button>插入链接</button>
+        <button>加粗</button>
+        <button>倾斜</button>
+        <button>删除</button>
+        <button>列表</button>
+    </span>
+
+    <br />
+    <br />
+    <div id="post_content" contenteditable="true"
+        style="min-height:300px;border-left: solid 2px black; padding-left: 5px;line-height:25px;">
+
+    </div>
+    <br />
+    <div>
+        <label>显示模式：</label>
+        <select id="post_show_type">
+            <option value="rich">Rich Text</option>
+            <option value="raw">Raw Text</option>
+        </select>
+        <button id="post_save_btn">保存</button>
+    </div>
+    <script type="module">
+        import { req } from "/js/req.js"
+        import { getToken } from "/js/token.js"
+        import { Github } from "/js/github.js"
+
+        let url = window.location.href
+        let queryString = url.substr(url.indexOf("?") + 1)
+        let queryParams = queryString.split("&")
+        let target = ""
+        let title = ""
+        let category = ""
+        queryParams.forEach(paramKV => {
+            let keyAndValue = paramKV.split("=")
+            if (keyAndValue[0] == "target") {
+                target = decodeURI(keyAndValue[1])
+            }
+            if (keyAndValue[0] == "title") {
+                title = decodeURI(keyAndValue[1])
+            }
+            if (keyAndValue[0] == "category") {
+                category = decodeURI(keyAndValue[1])
+            }
+        })
+        if (title) {
+            document.getElementById("post_title").value = title
+            document.getElementById("post_title").setAttribute("disabled", "true")
+        }
+        if (category) {
+            document.getElementById("post_category").value = category
+            document.getElementById("post_category").setAttribute("disabled", "true")
+        }
+
+        function loadContent(showType) {
+            if (!showType) {
+                showType = "rich"
+            }
+            let post_content = document.querySelector("#post_content")
+            if (target && target != "") {
+                req(target, "GET").then(data => {
+                    data.message = data.message.replaceAll("\n", "<br/>")
+                    data.message = data.message.replaceAll("\t", "&nbsp;&nbsp;&nbsp;&nbsp;")
+                    if (showType == "rich") {
+                        post_content.innerHTML = data.message
+                    }
+                    if (showType == "raw") {
+                        post_content.innerText = data.message
+                    }
+                })
+            }
+        }
+        loadContent()
+
+
+        // control
+        document.getElementById("post_show_type").onchange = showTypeChange
+        function showTypeChange(e) {
+            if (e.target.value == "raw") {
+                loadContent("raw")
+            } else if (e.target.value == "rich") {
+                loadContent("rich")
+            }
+        }
+
+        // edit_btn
+        document.getElementById("post_save_btn").onclick = saveBtnOnclick
+        function saveBtnOnclick(e) {
+            let commitFiles = []
+
+            let post_content = document.getElementById("post_content")
+
+            let token = getToken()
+            if (!token) {
+                alert("密码错误！")
+                throw Error("密码错误！")
+            }
+
+            let showType = document.getElementById("post_show_type").value
+
+            let content = "";
+            if (showType == "rich") {
+                content = post_content.innerHTML
+            } else {
+                content = post_content.innerText
+            }
+
+            let title = document.getElementById("post_title").value
+            let category = document.getElementById("post_category").value
+
+            let github = new Github("Cuishibing/Cuishibing.github.io", token)
+
+            let path = ""
+            if (target) {
+                path = target
+            } else {
+                if (!title) {
+                    alert("标题为空！")
+                    throw Error("标题为空！")
+                }
+                path = "/posts/" + title + ".html"
+            }
+
+            path = decodeURI(path)
+
+            commitFiles.push({
+                path: path,
+                content: content
+            })
+
+            if (!category) {
+                alert("类型为空！")
+                throw Error("类型为空！")
+            }
+
+            req("/category/category.json", "GET").then(data => {
+                let categories = data.categories
+
+                let needUpdate = true
+                let post_list = null
+                categories.forEach(c => {
+                    if (c.name == category) {
+                        if (c.post_list) {
+                            post_list = c.post_list
+                            c.post_list.forEach(p => {
+                                if (p.name == title && p.path == path) {
+                                    needUpdate = false
+                                }
+                            })
+                        }
+                    }
+                })
+
+                if (needUpdate) {
+                    if (!post_list) {
+                        post_list = []
+                        categories.push({
+                            name: category,
+                            post_list: post_list
+                        })
+                    }
+                    post_list.push({
+                        name: title,
+                        path: path
+                    })
+
+                    commitFiles.push({
+                        path: "/category/category.json",
+                        content: JSON.stringify(data)
+                    })
+                }
+
+                github.commitFile(commitFiles).then(data => {
+                    console.info(data)
+                    alert("保存成功")
+                    window.close()
+                })
+
+            })
+        }
+    </script>
+</body>
+
+</html>

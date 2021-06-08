@@ -34,7 +34,7 @@
                     c.post_list.forEach(post => {
                         let h5 = document.createElement("h5")
                         let a = document.createElement("a")
-                        a.setAttribute("href", "/postview/postview.html?target=" + post.path + "&title=" + post.name)
+                        a.setAttribute("href", "/postview/postview.html?target=" + post.path + "&title=" + post.name + "&category=" + e.target.innerText)
                         a.setAttribute("target", "_blank")
                         a.innerText = post.name
 

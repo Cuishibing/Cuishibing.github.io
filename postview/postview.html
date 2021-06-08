@@ -38,6 +38,7 @@
         let queryParams = queryString.split("&")
         let target = ""
         let title = ""
+        let category = ""
         queryParams.forEach(paramKV => {
             let keyAndValue = paramKV.split("=")
             if (keyAndValue[0] == "target") {
@@ -46,7 +47,9 @@
             if (keyAndValue[0] == "title") {
                 title = keyAndValue[1]
             }
-
+            if (keyAndValue[0] == "category") {
+                category = keyAndValue[1]
+            }
         })
 
         document.getElementById("post_title").innerText = decodeURI(title)
@@ -85,42 +88,7 @@
         // edit_btn
         document.getElementById("post_edit_btn").onclick = editBtnOnclick
         function editBtnOnclick(e) {
-            let post_content = document.getElementById("post_content")
-
-            let contenteditable = post_content.getAttribute("contenteditable")
-
-            if (contenteditable == "true") {
-                e.target.innerText = "编辑"
-                post_content.setAttribute("contenteditable", false)
-
-                let token = getToken()
-                if (!token) {
-                    alert("密码错误")
-                    return
-                }
-
-                let showType = document.getElementById("post_show_type").value
-                console.info(showType)
-                let content = "";
-                if (showType == "rich") {
-                    content = post_content.innerHTML
-                } else {
-                    content = post_content.innerText
-                }
-
-                let github = new Github("Cuishibing/Cuishibing.github.io", token)
-                github.commitFile([
-                    {
-                        path: decodeURI(target),
-                        content: content,
-                    }
-                ])
-
-            } else {
-                e.target.innerText = "保存"
-                post_content.setAttribute("contenteditable", true)
-                post_content.focus()
-            }
+            window.location.href = "/posteditor/posteditor.html?target="+ target + "&title="+ title + "&category=" + category
         }
     </script>
 

@@ -20,11 +20,8 @@ class Github {
     async commitFile(files) {
         let masterRef = await this.loadRef("heads/master")
         let masterCommit = await this.loadCommit(masterRef.object.sha)
-        console.info(masterCommit)
-
+        
         this.rootTree = masterCommit.tree.sha
-        console.info("rootTree:", this.rootTree)
-
 
         let createTrees = []
         files.forEach(file => {
@@ -47,14 +44,12 @@ class Github {
 
         // call api create tree
         let createTreeResult = await this.createTree(this.rootTree, createTrees)
-        console.info(createTreeResult)
 
         // call api commit
         let createCommitResult = await this.createCommit(createTreeResult.sha, [masterCommit.sha], "auto commit", {
             name: "Cuishibing",
             email: "643237029@qq.com"
         })
-        console.info(createCommitResult)
 
         // call api update ref
         return await this.updateRef("heads/master", createCommitResult.sha)
@@ -73,26 +68,11 @@ class Github {
         }
     }
 
-    _treeContain(trees, path) {
-        let contain = false
-
-        for (let i = 0; i < trees.length; i++) {
-            const tree = trees[i];
-            if (tree.path == path) {
-                contain = true;
-                break
-            }
-        }
-
-        return contain;
-    }
-
     async getTreesWithCache(sha) {
         if (this.treeCache[sha]) {
             return this.treeCache[sha]
         } else {
             let treeInfo = await this.loadTree(sha)
-            console.info("treeInfo:", treeInfo)
 
             this.treeCache[sha] = treeInfo.tree
             return treeInfo.tree
