@@ -16,16 +16,10 @@
     <div>
         <h2 id="post_title"></h2>
     </div>
-    <div id="post_content" style="border-left: solid 2px black; padding-left: 5px;line-height:25px;">
-
-    </div>
-    <br />
+    <div id="post_content" style="margin-top: 10px;margin-bottom:10px"></div>
+    <script src="https://cdn.jsdelivr.net/npm/wangeditor@latest/dist/wangEditor.min.js"></script>
+    
     <div>
-        <label>显示模式：</label>
-        <select id="post_show_type">
-            <option value="rich">Rich Text</option>
-            <option value="raw">Raw Text</option>
-        </select>
         <button id="post_edit_btn">编辑</button>
     </div>
     <script type="module">
@@ -54,36 +48,21 @@
 
         document.getElementById("post_title").innerText = decodeURI(title)
 
-        function loadContent(showType) {
-            if (!showType) {
-                showType = "rich"
-            }
-            let post_content = document.querySelector("#post_content")
+        const E = window.wangEditor;
+        const editor = new E("#post_content");
+        editor.config.menus = []
+        editor.config.showFullScreen = false
+        editor.create();
+        editor.disable()
+
+        function loadContent() {
             if (target && target != "") {
                 req(target, "GET").then(data => {
-                    data.message = data.message.replaceAll("\n", "<br/>")
-                    data.message = data.message.replaceAll("\t", "&nbsp;&nbsp;&nbsp;&nbsp;")
-                    if (showType == "rich") {
-                        post_content.innerHTML = data.message
-                    }
-                    if (showType == "raw") {
-                        post_content.innerText = data.message
-                    }
+                    editor.txt.html(data.message)
                 })
             }
         }
         loadContent()
-
-
-        // control
-        document.getElementById("post_show_type").onchange = showTypeChange
-        function showTypeChange(e) {
-            if (e.target.value == "raw") {
-                loadContent("raw")
-            } else if (e.target.value == "rich") {
-                loadContent("rich")
-            }
-        }
 
         // edit_btn
         document.getElementById("post_edit_btn").onclick = editBtnOnclick

@@ -21,36 +21,10 @@
         <label>类型：</label>
         <input id="post_category" placeholder="输入类型" />
     </span>
+    <div id="post_content" style="margin-top: 10px;margin-bottom:10px"></div>
+    <script src="https://cdn.jsdelivr.net/npm/wangeditor@latest/dist/wangEditor.min.js"></script>
 
-    <span>
-        <select id="edit_title">
-            <option value="0">正文</option>
-            <option value="1">一级标题</option>
-            <option value="2">二级标题</option>
-            <option value="3">三级标题</option>
-            <option value="4">四级标题</option>
-            <option value="5">五级标题</option>
-        </select>
-        <button>插入链接</button>
-        <button>加粗</button>
-        <button>倾斜</button>
-        <button>删除</button>
-        <button>列表</button>
-    </span>
-
-    <br />
-    <br />
-    <div id="post_content" contenteditable="true"
-        style="min-height:300px;border-left: solid 2px black; padding-left: 5px;line-height:25px;">
-
-    </div>
-    <br />
     <div>
-        <label>显示模式：</label>
-        <select id="post_show_type">
-            <option value="rich">Rich Text</option>
-            <option value="raw">Raw Text</option>
-        </select>
         <button id="post_save_btn">保存</button>
     </div>
     <script type="module">
@@ -85,57 +59,31 @@
             document.getElementById("post_category").setAttribute("disabled", "true")
         }
 
+        const E = window.wangEditor;
+        const editor = new E("#post_content");
+        editor.create();
+
         function loadContent(showType) {
             if (!showType) {
                 showType = "rich"
             }
-            let post_content = document.querySelector("#post_content")
             if (target && target != "") {
                 req(target, "GET").then(data => {
-                    data.message = data.message.replaceAll("\n", "<br/>")
-                    data.message = data.message.replaceAll("\t", "&nbsp;&nbsp;&nbsp;&nbsp;")
-                    if (showType == "rich") {
-                        post_content.innerHTML = data.message
-                    }
-                    if (showType == "raw") {
-                        post_content.innerText = data.message
-                    }
+                    editor.txt.html(data.message)
                 })
             }
         }
         loadContent()
-
-
-        // control
-        document.getElementById("post_show_type").onchange = showTypeChange
-        function showTypeChange(e) {
-            if (e.target.value == "raw") {
-                loadContent("raw")
-            } else if (e.target.value == "rich") {
-                loadContent("rich")
-            }
-        }
 
         // edit_btn
         document.getElementById("post_save_btn").onclick = saveBtnOnclick
         function saveBtnOnclick(e) {
             let commitFiles = []
 
-            let post_content = document.getElementById("post_content")
-
             let token = getToken()
             if (!token) {
                 alert("密码错误！")
                 throw Error("密码错误！")
-            }
-
-            let showType = document.getElementById("post_show_type").value
-
-            let content = "";
-            if (showType == "rich") {
-                content = post_content.innerHTML
-            } else {
-                content = post_content.innerText
             }
 
             let title = document.getElementById("post_title").value
@@ -158,7 +106,7 @@
 
             commitFiles.push({
                 path: path,
-                content: content
+                content: editor.txt.html()
             })
 
             if (!category) {
@@ -206,7 +154,6 @@
                 github.commitFile(commitFiles).then(data => {
                     console.info(data)
                     alert("保存成功")
-                    window.close()
                 })
 
             })
