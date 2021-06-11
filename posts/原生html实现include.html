@@ -1,9 +1,3 @@
-原生的html没有提供include功能
+<p><font face="楷体" size="2">原生的html没有提供include功能
 
-如果不想引入其他前端开发框架，可以使用iframe实现：
-
-- 加载想要include的页面
-- 使用js获取到页面的内容，动态添加到原页面
-
-注意点：
-- 直接用innerHtml添加页面，其中的script不会执行，需要另外处理
+如果不想引入其他前端开发框架，可以自己实现一个简单的include机制：</font></p><ul><li><font face="楷体">是用xhr请求要include的页面数据</font></li><li><font face="楷体">得到页面数据后用js放到包含页面的地方</font></li></ul><p><font size="2" face="楷体">注意点：</font></p><p><font size="2" face="楷体">直接用ele.innerHTML设置页面内容，其中的js代码不会执行，需要我们解析出来script元素重新添加一次才可以</font></p>
