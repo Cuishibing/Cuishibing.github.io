@@ -13,19 +13,15 @@
 
 <body>
     <include src="/header/s_header.html"></include>
-    <div>
-        <h2 id="post_title"></h2>
-    </div>
+
+    <h2 id="post_title"></h2>
+
     <div id="post_content" style="margin-top: 10px;margin-bottom:10px"></div>
-    <script src="https://cdn.jsdelivr.net/npm/wangeditor@latest/dist/wangEditor.min.js"></script>
-    
     <div>
         <button id="post_edit_btn">编辑</button>
     </div>
     <script type="module">
         import { req } from "/js/req.js"
-        import { getToken } from "/js/token.js"
-        import { Github } from "/js/github.js"
 
         let url = window.location.href
         let queryString = url.substr(url.indexOf("?") + 1)
@@ -48,26 +44,19 @@
 
         document.getElementById("post_title").innerText = decodeURI(title)
 
-        const E = window.wangEditor;
-        const editor = new E("#post_content");
-        editor.config.menus = []
-        editor.config.showFullScreen = false
-        editor.create();
-        editor.disable()
-
         function loadContent() {
             if (target && target != "") {
                 req(target, "GET").then(data => {
-                    editor.txt.html(data.message)
+                    document.getElementById("post_content")
+                    post_content.innerHTML = data.message
                 })
             }
         }
         loadContent()
-
         // edit_btn
         document.getElementById("post_edit_btn").onclick = editBtnOnclick
         function editBtnOnclick(e) {
-            window.location.href = "/posteditor/posteditor.html?target="+ target + "&title="+ title + "&category=" + category
+            window.location.href = "/posteditor/posteditor.html?target=" + target + "&title=" + title + "&category=" + category
         }
     </script>
 
