@@ -1,20 +1,48 @@
-<!-- 随笔 算法 设计模式 Linux 操作系统 网络 数据库-->
+<!DOCTYPE html>
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8">
-    <link href="/css/common.css" rel="stylesheet" type="text/css"/>
-    <script type="module">
-        import {init} from "/js/include.js"
-        init()
-    </script>
-    
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cuishibing的博客</title>
+
 </head>
 
 <body>
-    <include src="/header/s_header.html"></include>
-    <include src="/category/s_category.html"></include>
+  <div id="app">
+    <router-view></router-view>
+  </div>
+  
+  <script src="https://unpkg.com/vue@3.2.20"></script>
+  <script src="https://unpkg.com/vue3-sfc-loader@0.8.4/dist/vue3-sfc-loader.js"></script>
+  <script src="https://unpkg.com/vue-router@4.0.5/dist/vue-router.global.js"></script>
+
+  
+  <!-- import stylesheet -->
+  <link rel="stylesheet" href="https://unpkg.com/view-ui-plus/dist/styles/viewuiplus.css">
+  <!-- import View UI Plus -->
+  <script src="https://unpkg.com/view-ui-plus"></script>
+
+  
+  <script type="module">
+    import { routes } from "/js/routes.js";
+    const router = VueRouter.createRouter({
+      history: VueRouter.createWebHashHistory(),
+      routes: routes,
+    });
+
+    const app = {
+      components: {},
+    };
+    const appvue = Vue.createApp(app);
+
+    appvue.use(ViewUIPlus);
+    appvue.use(router);
+
+    appvue.mount("#app");
+  </script>
 </body>
 
 </html>
