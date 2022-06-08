@@ -1,28 +1,35 @@
 <template>
-  
-    <Menu active-name="1-2"
-            theme="dark"
-            width="auto">
-            <MenuItem  v-for="c in categories"
-      :key="c.name" :name="c.name">
 
-            <span>{{c.name}}</span>
-            </MenuItem>
-          </Menu>
-  
+  <div style="display:flex">
+    <button v-for="c in categories" class="category"
+      :key="c.name"
+      :name="c.name"
+      @click="onCategoryClick(c.name)">
+      {{c.name}}
+    </button>
+  </div>
+
 </template>
 
 <script>
-import { req } from '/js/req.js'
+import { getFile } from '/js/filefactory.js'
 export default {
   data() {
     return {
       categories: []
     }
   },
+  methods: {
+    onCategoryClick(cname) {
+      this.$router.push({
+        path: "/postlist",
+        query: { c: cname }
+      });
+    }
+  },
   mounted() {
-    req("/meta/meta.json", "GET").then(data => {
-      this.categories = data.categories
+    getFile('/meta/meta.json').then(data => {
+      this.categories = JSON.parse(data).categories
     })
   }
 }

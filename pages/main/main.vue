@@ -1,18 +1,12 @@
 <template>
   <div>
 
-    <div class="layout">
-      <Layout>
-        <MHeader />
-        <Layout>
-          <Sider ref="side1"
-            hide-trigger
-            collapsible
-            :collapsed-width="78">
-            <Category />
-          </Sider>
-        </Layout>
-      </Layout>
+    <MHeader />
+    <div >
+        <Category />
+      <div >
+        <router-view />
+      </div>
     </div>
   </div>
 </template>

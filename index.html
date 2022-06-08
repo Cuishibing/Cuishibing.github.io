@@ -20,10 +20,9 @@
   <script src="https://unpkg.com/vue-router@4.0.5/dist/vue-router.global.js"></script>
 
   
-  <!-- import stylesheet -->
-  <link rel="stylesheet" href="https://unpkg.com/view-ui-plus/dist/styles/viewuiplus.css">
-  <!-- import View UI Plus -->
-  <script src="https://unpkg.com/view-ui-plus"></script>
+  <!-- <link rel="stylesheet" href="https://unpkg.com/view-ui-plus/dist/styles/viewuiplus.css">
+  <script src="https://unpkg.com/view-ui-plus"></script> -->
+  <script src="https://cdn.ckeditor.com/ckeditor5/34.1.0/classic/ckeditor.js"></script>
 
   
   <script type="module">
@@ -38,7 +37,7 @@
     };
     const appvue = Vue.createApp(app);
 
-    appvue.use(ViewUIPlus);
+    // appvue.use(ViewUIPlus);
     appvue.use(router);
 
     appvue.mount("#app");
