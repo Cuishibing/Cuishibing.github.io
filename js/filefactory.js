@@ -96,7 +96,7 @@ const syncFiles = async () => {
 
     for (let path in fileCache) {
       console.info("path:" + path)
-      fileCache[path].modify = true
+      fileCache[path].modify = false
     }
 
     localStorage.setItem(fileStorageKey, JSON.stringify(fileCache))
