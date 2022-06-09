@@ -99,6 +99,8 @@ const syncFiles = async () => {
       fileCache[path].modify = true
     }
 
+    localStorage.setItem(fileStorageKey, JSON.stringify(fileCache))
+
     alert("保存成功")
   })
 }
