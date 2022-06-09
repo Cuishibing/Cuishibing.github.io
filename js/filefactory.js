@@ -1,3 +1,6 @@
+import { Github } from "/js/github.js"
+import { getToken } from "/js/token.js"
+
 const fileStorageKey = "file_cache"
 const getFile = async path => {
   if (path === null || path === undefined || path === "") {
@@ -57,4 +60,47 @@ const saveFile = async (path, content) => {
   localStorage.setItem(fileStorageKey, JSON.stringify(fileCache))
 }
 
-export { getFile, saveFile }
+const syncFiles = async () => {
+  console.info("dosyncFiles")
+  let token = getToken()
+  if (!token) {
+    alert("密码错误！")
+    throw Error("密码错误！")
+  }
+  console.info(token)
+  let github = new Github("Cuishibing/Cuishibing.github.io", token)
+
+  let fileCacheData = localStorage.getItem(fileStorageKey)
+  if (fileCacheData == null) {
+    return
+  }
+
+  let commitFiles = []
+
+  let fileCache = JSON.parse(fileCacheData)
+  for (let path in fileCache) {
+    console.info("path:" + path)
+    if (fileCache[path].modify !== true) {
+      continue
+    }
+    commitFiles.push({
+      path: path,
+      content: fileCache[path].content
+    })
+  }
+  if (commitFiles.length === 0) {
+    return
+  }
+  github.commitFile(commitFiles).then(data => {
+    console.info(data)
+
+    for (let path in fileCache) {
+      console.info("path:" + path)
+      fileCache[path].modify = true
+    }
+
+    alert("保存成功")
+  })
+}
+
+export { getFile, saveFile, syncFiles }
