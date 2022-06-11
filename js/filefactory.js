@@ -24,6 +24,9 @@ const getFile = async path => {
     if (res.ok) {
       return res.text()
     }
+    if (res.status == 404) {
+      return null
+    }
     throw Error(res)
   })
 
@@ -61,15 +64,6 @@ const saveFile = async (path, content) => {
 }
 
 const syncFiles = async () => {
-  console.info("dosyncFiles")
-  let token = getToken()
-  if (!token) {
-    alert("密码错误！")
-    throw Error("密码错误！")
-  }
-  console.info(token)
-  let github = new Github("Cuishibing/Cuishibing.github.io", token)
-
   let fileCacheData = localStorage.getItem(fileStorageKey)
   if (fileCacheData == null) {
     return
@@ -91,17 +85,22 @@ const syncFiles = async () => {
   if (commitFiles.length === 0) {
     return
   }
-  github.commitFile(commitFiles).then(data => {
-    console.info(data)
 
+  let token = getToken()
+  if (!token) {
+    alert("密码错误！")
+    throw Error("密码错误！")
+  }
+  console.info(token)
+  let github = new Github("Cuishibing/Cuishibing.github.io", token)
+
+  github.commitFile(commitFiles).then(data => {
     for (let path in fileCache) {
       console.info("path:" + path)
       fileCache[path].modify = false
     }
-
     localStorage.setItem(fileStorageKey, JSON.stringify(fileCache))
-
-    alert("保存成功")
+    alert("同步成功")
   })
 }
 

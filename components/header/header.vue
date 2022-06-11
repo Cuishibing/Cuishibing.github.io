@@ -10,9 +10,7 @@
 
 </template>
 
-<script>
-import { Github } from "/js/github.js"
-import { getToken } from "/js/token.js"
+<script>  
 import { syncFiles } from '/js/filefactory.js'
 export default {
   methods: {
