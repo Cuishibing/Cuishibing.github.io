@@ -3,12 +3,13 @@
     <h2 style="text-align:center">{{this.$route.query.i}}</h2>
     <div id="editor"></div>
     <button @click="save">保存</button>
+    <button @click="deleteFile">删除</button>
   </div>
 </template>
 
 
 <script>
-import { getFile, saveFile } from '/js/filefactory.js'
+import { getFile, saveFile, deleteFile } from '/js/filefactory.js'
 export default {
   data() {
     return {
@@ -17,16 +18,19 @@ export default {
   methods: {
     save() {
       saveFile(this.path, this.editor.getData())
+    },
+    deleteFile() {
+      deleteFile(this.path)
     }
   },
   mounted() {
     let path = `/posts/${this.$route.query.i}/index`
     this.path = path
     let that = this
-    
+
     ClassicEditor
-      .create(document.querySelector('#editor'),{
-        
+      .create(document.querySelector('#editor'), {
+
       }).then(editor => {
         that.editor = editor
         getFile(path).then(data => {

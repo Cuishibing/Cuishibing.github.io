@@ -124,10 +124,13 @@ const syncFiles = async () => {
     for (let path in fileCache) {
       console.info("path:" + path)
       fileCache[path].modify = false
+      if (fileCache[path].needDelete) {
+        fileCache[path] = null
+      }
     }
     localStorage.setItem(fileStorageKey, JSON.stringify(fileCache))
     alert("同步成功")
   })
 }
 
-export { getFile, saveFile, syncFiles }
+export { getFile, saveFile, deleteFile, syncFiles }
