@@ -3,7 +3,7 @@
     <ol>
       <li class="postitem"
         v-for="p in postList"
-        :key="p.name"><a :href="'index.html#/posteditor?i=' + p.name">{{p.name}}</a></li>
+        :key="p.name"><a :href="'index.html#/posteditor?c=' + cname + '&i=' + p.name">{{p.name}}</a></li>
 
       <div style="display:flex">
         <input v-model="newPostName"

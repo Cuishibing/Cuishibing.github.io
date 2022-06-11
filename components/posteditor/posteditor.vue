@@ -10,6 +10,7 @@
 
 <script>
 import { getFile, saveFile, deleteFile } from '/js/filefactory.js'
+import CategoryService from '/js/categoryapi.js'
 export default {
   data() {
     return {
@@ -21,10 +22,16 @@ export default {
     },
     deleteFile() {
       deleteFile(this.path)
+      CategoryService.init().then(cs=>{
+        cs.deletePost(this.cname, this.pname)
+        this.$router.back()
+      })
     }
   },
   mounted() {
     let path = `/posts/${this.$route.query.i}/index`
+    this.cname = this.$route.query.c
+    this.pname = this.$route.query.i
     this.path = path
     let that = this
 

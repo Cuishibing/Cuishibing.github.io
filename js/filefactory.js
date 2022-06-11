@@ -125,7 +125,7 @@ const syncFiles = async () => {
       console.info("path:" + path)
       fileCache[path].modify = false
       if (fileCache[path].needDelete) {
-        fileCache[path] = null
+        Reflect.deleteProperty(fileCache, path)
       }
     }
     localStorage.setItem(fileStorageKey, JSON.stringify(fileCache))
