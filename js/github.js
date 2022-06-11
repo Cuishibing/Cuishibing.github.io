@@ -67,7 +67,7 @@ class Github {
     async commitFile(files) {
         let masterRef = await this.loadRef("heads/master")
         let masterCommit = await this.loadCommit(masterRef.object.sha)
-        
+
         this.rootTree = masterCommit.tree.sha
 
         let createTrees = []
@@ -78,14 +78,11 @@ class Github {
             if (file.path.length == 0) {
                 return
             }
-            if (file.path[file.path.length - 1] == "/") {
-                return
-            }
             if (file.path[0] == "/") {
                 file.path = file.path.substr(1)
             }
 
-            let ct = this._createTree(file.path, file.content)
+            let ct = this._createTree(file.path, file.content, file.needDelete)
             createTrees.push(ct)
         })
 
@@ -102,10 +99,18 @@ class Github {
         return await this.updateRef("heads/master", createCommitResult.sha)
     }
 
-    _createTree(path, content) {
+    _createTree(path, content, needDelete) {
         let fileContent = null;
         if (typeof content == "string") {
             fileContent = content
+        }
+        if (needDelete) {
+            return {
+                path: path,
+                mode: fileContent ? "100644" : "040000",
+                type: fileContent ? "blob" : "tree",
+                sha: null
+            }
         }
         return {
             path: path,

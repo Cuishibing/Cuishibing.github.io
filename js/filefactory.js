@@ -18,6 +18,9 @@ const getFile = async path => {
   }
 
   if (fileCache[path]) {
+    if (fileCache[path].needDelete) {
+      return null
+    }
     return fileCache[path].content
   }
   let content = await fetch(path).then(res => {
@@ -63,6 +66,28 @@ const saveFile = async (path, content) => {
   localStorage.setItem(fileStorageKey, JSON.stringify(fileCache))
 }
 
+const deleteFile = async (path) => {
+  if (path === null || path === undefined || path === "") {
+    return
+  }
+  let cacheData = localStorage.getItem(fileStorageKey)
+  let fileCache;
+  if (cacheData) {
+    fileCache = JSON.parse(cacheData)
+  }
+  if (fileCache === null || fileCache === undefined) {
+    fileCache = {}
+    localStorage.setItem(fileStorageKey, JSON.stringify(fileCache))
+  }
+  fileCache[path] = {
+    content: path[path.length - 1] === '/' ? null : "",
+    modify: true,
+    needDelete: true
+  }
+
+  localStorage.setItem(fileStorageKey, JSON.stringify(fileCache))
+}
+
 const syncFiles = async () => {
   let fileCacheData = localStorage.getItem(fileStorageKey)
   if (fileCacheData == null) {
@@ -79,7 +104,8 @@ const syncFiles = async () => {
     }
     commitFiles.push({
       path: path,
-      content: fileCache[path].content
+      content: fileCache[path].content,
+      needDelete: fileCache[path].needDelete
     })
   }
   if (commitFiles.length === 0) {
