@@ -11,6 +11,7 @@
 <script>
 import { getFile, saveFile, deleteFile } from '/js/filefactory.js'
 import CategoryService from '/js/categoryapi.js'
+import UploadAdapter from '/js/base64imguploador.js'
 export default {
   data() {
     return {
@@ -22,7 +23,7 @@ export default {
     },
     deleteFile() {
       deleteFile(this.path)
-      CategoryService.init().then(cs=>{
+      CategoryService.init().then(cs => {
         cs.deletePost(this.cname, this.pname)
         this.$router.back()
       })
@@ -37,12 +38,17 @@ export default {
 
     ClassicEditor
       .create(document.querySelector('#editor'), {
-
+        
       }).then(editor => {
         that.editor = editor
         getFile(path).then(data => {
           editor.setData(data)
         })
+
+        // 配置base64 uploador
+        editor.plugins.get('FileRepository').createUploadAdapter = (loader) => {
+          return new UploadAdapter(loader);
+        };
       })
       .catch(error => {
         console.log(error);
