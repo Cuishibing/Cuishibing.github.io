@@ -1,0 +1,450 @@
+<h1 id="id-锁的分类">锁的分类</h1>
+<h2 id="id-公平锁和非公平锁">公平锁和非公平锁</h2>
+<p>公平锁是指多个线程在等待同一个锁时，必须按照申请锁的先后顺序来一次获得锁。</p>
+<p>公平锁的好处是等待锁的线程不会饿死，但是整体效率相对低一些；非公平锁的好处是整体效率相对高一些，但是有些线程可能会饿死或者说很早就在等待锁，但要等很久才会获得锁。其中的原因是公平锁是严格按照请求所的顺序来排队获得锁的，而非公平锁时可以抢占的，即如果在某个时刻有线程需要获取锁，而这个时候刚好锁可用，那么这个线程会直接抢占，而这时阻塞在等待队列的线程则不会被唤醒。</p>
+<p>公平锁可以使用new ReentrantLock(true)实现。</p>
+<h2 id="id-乐观锁和悲观锁">乐观锁和悲观锁</h2>
+<p>锁从宏观上分类，分为悲观锁与乐观锁。</p>
+<p>乐观锁是一种乐观思想，即认为读多写少，遇到并发写的可能性低，每次去拿数据的时候都认为别人不会修改，所以不会上锁，但是在更新的时候会判断一下在此期间别人有没有去更新这个数据，采取在写时先读出当前版本号，然后加锁操作（跟上一次的版本号比较，如果一样则更新），如果失败则要重复读-比较-写的操作。</p>
+<p>java中的乐观锁基本都是通过CAS操作实现的，CAS是一种更新的原子操作，比较当前值跟传入值是否一样，一样则更新，否则失败。</p>
+<p>悲观锁是就是悲观思想，即认为写多，遇到并发写的可能性高，每次去拿数据的时候都认为别人会修改，所以每次在读写数据的时候都会上锁，这样别人想读写这个数据就会block直到拿到锁。java中的悲观锁就是Synchronized，AQS框架下的锁则是先尝试CAS乐观锁去获取锁，获取不到，才会转换为悲观锁。</p>
+<h2 id="id-操作系统层面的锁和应用层面的锁">操作系统层面的锁和应用层面的锁</h2>
+<p>操作系统层面的锁主要是两类：</p>
+<ol>
+<li>
+<p>互斥锁： 一般用互斥信号量实现。互斥锁往往会导致线程挂起，从而带来一些线程上下文切换的开销，适合锁保持时间较长的情况。</p>
+</li>
+<li>
+<p>自旋锁： 获取访问互斥资源的锁失败，不会造成线程挂起和线程上下文切换，适合锁保持时间较短的情形。</p>
+</li>
+</ol>
+<p>自旋锁</p>
+<p>Java的线程是映射到操作系统的原生线程之上的，如果要阻塞或唤醒一个线程，都需要操作系统来帮忙完成，这就需要从用户态转换到核心态中，因此状态装换需要耗费很多的处理器时间，对于代码简单的同步块（如被synchronized修饰的getter()和setter()方法），状态转换消耗的时间有可能比用户代码执行的时间还要长。</p>
+<p>虚拟机的开发团队注意到在许多应用上，共享数据的锁定状态只会持续很短的一段时间，为了这段时间取挂起和恢复现场并不值得。如果物理机器有一个以上的处理器，能让两个或以上的线程同时并行执行，我们就可以让后面请求锁的那个线程&ldquo;稍等一下&ldquo;，但不放弃处理器的执行时间，看看持有锁的线程是否很快就会释放锁。为了让线程等待，我们只需让线程执行一个忙循环（自旋），这项技术就是所谓的自旋锁。</p>
+<p>自旋等待不能代替阻塞。自旋等待本身虽然避免了线程切换的开销，但它是要占用处理器时间的，因此，如果锁被占用的时间很短，自旋当代的效果就会非常好，反之，如果锁被占用的时间很长，那么自旋的线程只会拜拜浪费处理器资源。因此，自旋等待的时间必须要有一定的限度，如果自旋超过了限定次数（默认是10次，可以使用-XX:PreBlockSpin来更改）没有成功获得锁，就应当使用传统的方式去挂起线程了。</p>
+<p>自旋锁在JDK1.4.2中引入，使用-XX:+UseSpinning来开启。JDK6中已经变为默认开启，并且引入了自适应的自旋锁。自适应意味着自旋的时间不在固定了，而是由前一次在同一个锁上的自旋时间及锁的拥有者的状态来决定。</p>
+<p>自旋是在轻量级锁中使用的，在重量级锁中，线程不使用自旋。</p>
+<p>应用层面的锁即JAVA中的内置锁，在JDK1.6之后又细分为：</p>
+<ol>
+<li><span class="ct-comment-marker" data-comment-id="28370630">偏向锁</span>
+<p>：</p>
+</li>
+<li><span class="ct-comment-marker" data-comment-id="28370631">轻量级锁</span>
+<p>：CAS</p>
+</li>
+<li>
+<p>重量级锁：互斥信号量</p>
+</li>
+</ol>
+<p>轻量级锁和重量级锁的重要区别是： 拿不到&ldquo;锁&rdquo;时，是否有线程调度和上下文切换的开销。</p>
+<p>这三种都是内置锁。这种内置锁底层的实现自然也依赖OS层面的锁。</p>
+<div>
+<div class="ct-table-wrapper">
+<table style="width: 46.635%;" data-table-layout="auto" data-table-id="8391646"><colgroup><col style="width: 25.1147%;"><col style="width: 25.1147%;"><col style="width: 25.1147%;"><col style="width: 24.5413%;"></colgroup>
+<thead>
+<tr class="originHeader">
+<th width="52px">
+<p>锁</p>
+</th>
+<th width="52px">
+<p>优点</p>
+</th>
+<th width="52px">
+<p>缺点</p>
+</th>
+<th width="52px">
+<p>适用场景</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td width="52px">
+<p>偏向锁</p>
+</td>
+<td width="52px">
+<p>加锁和解锁不需要额外的消耗，和执行非同步方法比仅存在纳秒级的差距。</p>
+</td>
+<td width="52px">
+<p>如果线程间存在锁竞争，会带来额外的锁撤销的消耗。</p>
+</td>
+<td width="52px">
+<p>适用于只有一个线程访问同步块场景。</p>
+</td>
+</tr>
+<tr>
+<td width="52px">
+<p>轻量级锁</p>
+</td>
+<td width="52px">
+<p>竞争的线程不会阻塞，提高了程序的响应速度</p>
+</td>
+<td width="52px">
+<p>如果始终得不到锁竞争的线程使用自旋会消耗CPU</p>
+</td>
+<td width="52px">
+<p>追求响应时间。</p>
+<p>同步块执行速度非常快</p>
+</td>
+</tr>
+<tr>
+<td width="52px">
+<p>重量级锁</p>
+</td>
+<td width="52px">
+<p>线程竞争不使用自旋，不会消耗CPU</p>
+</td>
+<td width="52px">
+<p>线程阻塞，响应时间缓慢</p>
+</td>
+<td width="52px">
+<p>追求吞吐量</p>
+<p>同步块执行速度较长</p>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<h1 id="id-锁和条件变量">锁和条件变量</h1>
+<p>锁和条件变量是进行多线程应用程序开发时最常用技术，在unix平台上开发多线程应用程序时最常用的就是unix提供的Pthread库，其中最为人熟悉两种线程同步机制就是mutex和condition variable。</p>
+<p>java更是在语言层就内置了这两者，分别称为intrinsic lock和intrinsic condition queue。</p>
+<p>这里先给出一个事实：java里任何对象内部都有一个锁等待队列和一个条件等待队列。</p>
+<h2 id="id-Java内部锁和内部条件队列">Java内部锁和内部条件队列</h2>
+<h3 id="id-内部锁">内部锁</h3>
+<p>java提供了synchronized关键字，用于保护临界区代码，如下：</p>
+<div class="ct-code">
+<div>
+<div>
+<div class="CodeMirror cm-s-xq-light" translate="no">
+<div class="CodeMirror-scroll" tabindex="-1">
+<div class="CodeMirror-sizer">
+<div>
+<div class="CodeMirror-lines" role="presentation">
+<div role="presentation">
+<div class="CodeMirror-code" tabindex="0" role="presentation" contenteditable="false" spellcheck="false">
+<pre class=" CodeMirror-line " role="presentation"><span role="presentation"><span class="cm-comment">//加锁</span></span></pre>
+<pre class=" CodeMirror-line " role="presentation"><span role="presentation"><span class="cm-keyword">synchronized</span> (<span class="cm-variable">obj</span>) {</span></pre>
+<pre class=" CodeMirror-line " role="presentation"><span role="presentation">    <span class="cm-comment">//action</span></span></pre>
+<pre class=" CodeMirror-line " role="presentation"><span role="presentation">}</span></pre>
+<pre class=" CodeMirror-line " role="presentation"><span role="presentation"><span class="cm-comment">//释放锁</span></span></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div>&nbsp;</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<p>多个线程将以互斥、串行的方式执行synchronized块内代码。其实synchronized的语义和mutex的语义完全一样，当线程进入synchronized块时先获取obj对象的锁，获取到了继续执行，获取不到则等待直到拥有者释放obj的锁（类比pthread_mutex_lock）。线程退出synchronized块时释放obj的锁，从而唤醒正在等待obj对象锁的线程（类比pthread_mutex_unlock）。</p>
+<p>synchronized块的括号内的obj可以是任何类型的对象，原因就是前面提到的，java的任何对象内部都有一个锁等待队列，也就是任何对象都能充当一个mutex。</p>
+<h3 id="id-内部条件队列">内部条件队列</h3>
+<p>java里所有类都有wait，notify，notifyAll三个方法，继承自Object类。这三个方法构成了java的内部条件队列API，也就是说java任何对象也都能充当一个条件变量。典型的写法如下：</p>
+<div class="ct-code">
+<div>
+<div class="CodeMirror cm-s-xq-light" translate="no">
+<div class="CodeMirror-scroll" tabindex="-1">
+<div class="CodeMirror-sizer">
+<div>
+<div class="CodeMirror-lines" role="presentation">
+<div role="presentation">
+<div class="CodeMirror-cursors">&nbsp;</div>
+<div class="CodeMirror-code" tabindex="0" role="presentation" contenteditable="false" spellcheck="false">
+<pre class=" CodeMirror-line " role="presentation"><span role="presentation"><span class="cm-comment">//加锁</span></span></pre>
+<pre class=" CodeMirror-line " role="presentation"><span role="presentation"><span class="cm-keyword">synchronized</span> (<span class="cm-variable">lock</span>) {</span></pre>
+<pre class=" CodeMirror-line " role="presentation"><span role="presentation">    <span class="cm-keyword">while</span> (<span class="cm-operator">!</span><span class="cm-variable">conditionPredicate</span>()) {</span></pre>
+<pre class=" CodeMirror-line " role="presentation"><span role="presentation">        <span class="cm-variable">lock</span>.<span class="cm-variable">wait</span>();</span></pre>
+<pre class=" CodeMirror-line " role="presentation"><span role="presentation">    }</span></pre>
+<pre class=" CodeMirror-line " role="presentation"><span role="presentation">    <span class="cm-comment">//条件满足后执行动作</span></span></pre>
+<pre class=" CodeMirror-line " role="presentation"><span role="presentation">    <span class="cm-comment">//action</span></span></pre>
+<pre class=" CodeMirror-line " role="presentation"><span role="presentation">} <span class="cm-comment">//释放锁 </span></span></pre>
+<pre class=" CodeMirror-line " role="presentation"><span role="presentation">&nbsp;</span></pre>
+<pre class=" CodeMirror-line " role="presentation"><span role="presentation">&nbsp;</span></pre>
+<pre class=" CodeMirror-line " role="presentation"><span role="presentation"><span class="cm-keyword">synchronized</span> (<span class="cm-variable">lock</span>) {</span></pre>
+<pre class=" CodeMirror-line " role="presentation"><span role="presentation">    <span class="cm-comment">// perform action that make the precondition become true</span></span></pre>
+<pre class=" CodeMirror-line " role="presentation"><span role="presentation">    <span class="cm-variable">notify</span>(); <span class="cm-comment">// or notifyAll()</span></span></pre>
+<pre class=" CodeMirror-line " role="presentation"><span role="presentation">} </span></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div>&nbsp;</div>
+</div>
+</div>
+</div>
+</div>
+<h2 id="id-Java显示锁和显式条件队列">Java显示锁和显式条件队列</h2>
+<p>自java5.0开始，Doug Lea为JDK贡献了大名鼎鼎的concurrent包，这里面不仅提供了很多新的并发编程的常用组件，另外还提供了一些性能和功能上有很大改善的java原有基础组件的替代品。比如ReentrantLock之于java内部锁，Condition之于内部条件队列。</p>
+<h3 id="id-显示锁">显示锁</h3>
+<p>最常用的显式锁是ReentrantLock，它实现了Lock接口，下面是Lock接口的定义，从中也可以看到它比内部锁功能强的地方。</p>
+<div>
+<div class="ct-code">
+<div>
+<div>
+<div class="CodeMirror cm-s-xq-light" translate="no">
+<div class="CodeMirror-scroll" tabindex="-1">
+<div class="CodeMirror-sizer">
+<div>
+<div class="CodeMirror-lines" role="presentation">
+<div role="presentation">
+<div class="CodeMirror-code" tabindex="0" role="presentation" contenteditable="false" spellcheck="false">
+<pre class=" CodeMirror-line " role="presentation"><span role="presentation"><span class="cm-keyword">public</span> <span class="cm-keyword">interface</span> <span class="cm-def">Lock</span> {</span></pre>
+<pre class=" CodeMirror-line " role="presentation"><span role="presentation">    <span class="cm-type">void</span> <span class="cm-variable">lock</span>();</span></pre>
+<pre class=" CodeMirror-line " role="presentation"><span role="presentation">    <span class="cm-type">void</span> <span class="cm-variable">lockInterruptibly</span>() <span class="cm-keyword">throws</span> <span class="cm-variable">InterruptedException</span>;</span></pre>
+<pre class=" CodeMirror-line " role="presentation"><span role="presentation">    <span class="cm-type">boolean</span> <span class="cm-variable">tryLock</span>();</span></pre>
+<pre class=" CodeMirror-line " role="presentation"><span role="presentation">    <span class="cm-type">boolean</span> <span class="cm-variable">tryLock</span>(<span class="cm-type">long</span> <span class="cm-variable">timeout</span>, <span class="cm-variable">TimeUnit</span> <span class="cm-variable">unit</span>) <span class="cm-keyword">throws</span> <span class="cm-variable">InterruptedException</span>;</span></pre>
+<pre class=" CodeMirror-line " role="presentation"><span role="presentation">    <span class="cm-type">void</span> <span class="cm-variable">unlock</span>();</span></pre>
+<pre class=" CodeMirror-line " role="presentation"><span role="presentation">    <span class="cm-variable">Condition</span> <span class="cm-variable">newCondition</span>();</span></pre>
+<pre class=" CodeMirror-line " role="presentation"><span role="presentation">} </span></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div>&nbsp;</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<p>ReentrantLock的标准使用方式如下：</p>
+<div class="ct-code">
+<div>
+<div>
+<div class="CodeMirror cm-s-xq-light" translate="no">
+<div class="CodeMirror-scroll" tabindex="-1">
+<div class="CodeMirror-sizer">
+<div>
+<div class="CodeMirror-lines" role="presentation">
+<div role="presentation">
+<div class="CodeMirror-cursors">&nbsp;</div>
+<div class="CodeMirror-code" tabindex="0" role="presentation" contenteditable="false" spellcheck="false">
+<pre class=" CodeMirror-line " role="presentation"><span role="presentation"><span class="cm-variable">Lock</span> <span class="cm-variable">lock</span> <span class="cm-operator">=</span> <span class="cm-keyword">new</span> <span class="cm-variable">ReentrantLock</span>();</span></pre>
+<pre class=" CodeMirror-line " role="presentation"><span role="presentation">​</span></pre>
+<pre class=" CodeMirror-line " role="presentation"><span role="presentation"><span class="cm-variable">lock</span>.<span class="cm-variable">lock</span>();</span></pre>
+<pre class=" CodeMirror-line " role="presentation"><span role="presentation"><span class="cm-keyword">try</span> {</span></pre>
+<pre class=" CodeMirror-line " role="presentation"><span role="presentation">    <span class="cm-comment">//临界区代码</span></span></pre>
+<pre class=" CodeMirror-line " role="presentation"><span role="presentation">} <span class="cm-keyword">finally</span> {</span></pre>
+<pre class=" CodeMirror-line " role="presentation"><span role="presentation">    <span class="cm-variable">lock</span>.<span class="cm-variable">unlock</span>();</span></pre>
+<pre class=" CodeMirror-line " role="presentation"><span role="presentation">} </span></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div>&nbsp;</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<h3 id="id-显示条件队列">显示条件队列</h3>
+<p>还记得Lock接口有个newCondition()方法吧，它返回一个与当前锁对象关联的Condition对象，即一个显示条件队列对象。Condition是个接口，定义如下：</p>
+<div>
+<div class="ct-code">
+<div>
+<div>
+<div class="CodeMirror cm-s-xq-light" translate="no">
+<div class="CodeMirror-scroll" tabindex="-1">
+<div class="CodeMirror-sizer">
+<div>
+<div class="CodeMirror-lines" role="presentation">
+<div role="presentation">
+<div class="CodeMirror-cursors">&nbsp;</div>
+<div class="CodeMirror-code" tabindex="0" role="presentation" contenteditable="false" spellcheck="false">
+<pre class=" CodeMirror-line " role="presentation"><span role="presentation"><span class="cm-keyword">public</span> <span class="cm-keyword">interface</span> <span class="cm-def">Condition</span> {</span></pre>
+<pre class=" CodeMirror-line " role="presentation"><span role="presentation">    <span class="cm-type">void</span> <span class="cm-variable">await</span>() <span class="cm-keyword">throws</span> <span class="cm-variable">InterruptedException</span>;</span></pre>
+<pre class=" CodeMirror-line " role="presentation"><span role="presentation">    <span class="cm-type">boolean</span> <span class="cm-variable">await</span>(<span class="cm-type">long</span> <span class="cm-variable">time</span>, <span class="cm-variable">TimeUnit</span> <span class="cm-variable">unit</span>) <span class="cm-keyword">throws</span> <span class="cm-variable">InterruptedException</span>;</span></pre>
+<pre class=" CodeMirror-line " role="presentation"><span role="presentation">    <span class="cm-type">long</span> <span class="cm-variable">awaitNanos</span>(<span class="cm-type">long</span> <span class="cm-variable">nanosTimeout</span>) <span class="cm-keyword">throws</span> <span class="cm-variable">InterruptedException</span>;</span></pre>
+<pre class=" CodeMirror-line " role="presentation"><span role="presentation">    <span class="cm-type">void</span> <span class="cm-variable">awaitUninterruptibly</span>();</span></pre>
+<pre class=" CodeMirror-line " role="presentation"><span role="presentation">    <span class="cm-type">boolean</span> <span class="cm-variable">awaitUntil</span>(<span class="cm-variable">Date</span> <span class="cm-variable">deadline</span>) <span class="cm-keyword">throws</span> <span class="cm-variable">InterruptedException</span>;</span></pre>
+<pre class=" CodeMirror-line " role="presentation"><span role="presentation">    <span class="cm-type">void</span> <span class="cm-variable">signal</span>();</span></pre>
+<pre class=" CodeMirror-line " role="presentation"><span role="presentation">    <span class="cm-type">void</span> <span class="cm-variable">signalAll</span>();</span></pre>
+<pre class=" CodeMirror-line " role="presentation"><span role="presentation">} </span></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div>&nbsp;</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<p>内部锁的wait、notify、notifyAll和Condition的await、signal、signalAll功能对应。Condition还提供了带时间版本的await和可中断的await。</p>
+<h2 id="id-Concurrent包其他类">Concurrent包其他类</h2>
+<p>&nbsp;并发集合：</p>
+<ul>
+<li>
+<p>ConcurrentHashMap</p>
+</li>
+<li>
+<p>copy-on-write collections</p>
+</li>
+<li>
+<p>BlockingQueue</p>
+</li>
+</ul>
+<p>各种Synchronizers：</p>
+<ul>
+<li>
+<p>latch：CountDownLatch</p>
+</li>
+<li>
+<p>FutureTask</p>
+</li>
+<li>
+<p>Semaphores</p>
+</li>
+<li>
+<p>Barriers</p>
+</li>
+</ul>
+<p>AbstractQueuedSynchronizer</p>
+</div>
+</div>
+<h1 id="id-什么是无锁？">什么是无锁？</h1>
+<h2 id="id-并发级别">并发级别</h2>
+<p>并发级别分为阻塞和非阻塞（非阻塞分为无障碍、无锁、无等待）</p>
+<h2 id="id-无锁（lock-free）">无锁（lock-free）</h2>
+<h3 id="id-CAS">CAS</h3>
+<p>CAS操作&mdash;&mdash;Compare &amp; Set，或是 Compare &amp; Swap，现在几乎所有的CPU指令都支持CAS的原子操作，X86下对应的是&nbsp;CMPXCHG&nbsp;汇编指令<strong>。</strong>有了这个原子操作，我们就可以用其来实现各种无锁（lock-free）的数据结构。</p>
+<div class="ct-code">
+<div>
+<div>
+<div class="CodeMirror cm-s-xq-light" translate="no">
+<div class="CodeMirror-scroll" tabindex="-1">
+<div class="CodeMirror-sizer">
+<div>
+<div class="CodeMirror-lines" role="presentation">
+<div role="presentation">
+<div class="CodeMirror-cursors">&nbsp;</div>
+<div class="CodeMirror-code" tabindex="0" role="presentation" contenteditable="false" spellcheck="false">
+<pre class=" CodeMirror-line " role="presentation"><span role="presentation">bool compare_and_swap (int *accum, int *dest, int newval)</span></pre>
+<pre class=" CodeMirror-line " role="presentation"><span role="presentation">{</span></pre>
+<pre class=" CodeMirror-line " role="presentation"><span role="presentation">  if ( *accum == *dest ) {</span></pre>
+<pre class=" CodeMirror-line " role="presentation"><span role="presentation">      *dest = newval;</span></pre>
+<pre class=" CodeMirror-line " role="presentation"><span role="presentation">      return true;</span></pre>
+<pre class=" CodeMirror-line " role="presentation"><span role="presentation">  }</span></pre>
+<pre class=" CodeMirror-line " role="presentation"><span role="presentation">  return false;</span></pre>
+<pre class=" CodeMirror-line " role="presentation"><span role="presentation">}</span></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div>&nbsp;</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<h3 id="id-CAS的ABA问题">CAS的ABA问题</h3>
+<p>所谓ABA，问题基本是这个样子：</p>
+<ol>
+<li>
+<p>进程P1在共享变量中读到值为A</p>
+</li>
+<li>
+<p>P1被抢占了，进程P2执行</p>
+</li>
+<li>
+<p>P2把共享变量里的值从A改成了B，再改回到A，此时被P1抢占。</p>
+</li>
+<li>
+<p>P1回来看到共享变量里的值没有被改变，于是继续执行。</p>
+</li>
+</ol>
+<p>虽然P1以为变量值没有改变，继续执行了，但是这个会引发一些潜在的问题。<strong>ABA问题最容易发生在lock free 的算法中的，CAS首当其冲，因为CAS判断的是指针的地址。如果这个地址被重用了呢，问题就很大了。</strong>（地址被重用是很经常发生的，一个内存分配后释放了，再分配，很有可能还是原来的地址）</p>
+<h1 id="id-Java无锁类使用">Java无锁类使用</h1>
+<h2 id="id-AtomicInteger">AtomicInteger</h2>
+<h2 id="id-AtomicReference">AtomicReference</h2>
+<h2 id="id-AtomicStampedReference">AtomicStampedReference</h2>
+<p>这个类的主要思想是加入时间戳来标识每一次改变。</p>
+<h2 id="id-无锁队列实现">无锁队列实现</h2>
+<p>参考：<a class="ct-link" title="并发队列-无界非阻塞队列 ConcurrentLinkedQueue 原理探究" spellcheck="false" href="http://www.importnew.com/25668.html" target="_blank" rel="noopener">并发队列-无界非阻塞队列 ConcurrentLinkedQueue 原理探究</a></p>
+<h2 id="id-无锁类库Disruptor">无锁类库Disruptor</h2>
+<p>参考：<a class="ct-link" title="并发框架Disruptor" spellcheck="false" href="https://km.sankuai.com/page/28370629" target="_blank" rel="noopener">并发框架Disruptor</a></p>
+<h1 id="id-锁优化">锁优化</h1>
+<h2 id="id-减少锁的时间">减少锁的时间</h2>
+<p>不需要同步执行的代码，能不放在同步快里面执行就不要放在同步快内，可以让锁尽快释放；</p>
+<div class="ct-code">
+<div>
+<div>
+<div class="CodeMirror cm-s-xq-light" translate="no">
+<div class="CodeMirror-scroll" tabindex="-1">
+<div class="CodeMirror-sizer">
+<div>
+<div class="CodeMirror-lines" role="presentation">
+<div role="presentation">
+<div>&nbsp;</div>
+<div class="CodeMirror-cursors">&nbsp;</div>
+<div class="CodeMirror-code" tabindex="0" role="presentation" contenteditable="false" spellcheck="false">
+<pre class=" CodeMirror-line " role="presentation"><span role="presentation"><span class="cm-keyword">public</span> <span class="cm-keyword">synchronized</span> <span class="cm-type">void</span> <span class="cm-def">syncMethod</span>() {  </span></pre>
+<pre class=" CodeMirror-line " role="presentation"><span role="presentation">  <span class="cm-variable">othercode1</span>();  </span></pre>
+<pre class=" CodeMirror-line " role="presentation"><span role="presentation">  <span class="cm-variable">mutextMethod</span>();  </span></pre>
+<pre class=" CodeMirror-line " role="presentation"><span role="presentation">  <span class="cm-variable">othercode2</span>(); </span></pre>
+<pre class=" CodeMirror-line " role="presentation"><span role="presentation">}</span></pre>
+<pre class=" CodeMirror-line " role="presentation"><span role="presentation">&nbsp;</span></pre>
+<pre class=" CodeMirror-line " role="presentation"><span role="presentation"><span class="cm-keyword">public</span> <span class="cm-type">void</span> <span class="cm-def">syncMethod</span>() {  </span></pre>
+<pre class=" CodeMirror-line " role="presentation"><span role="presentation">  <span class="cm-variable">othercode1</span>();  </span></pre>
+<pre class=" CodeMirror-line " role="presentation"><span role="presentation">  <span class="cm-keyword">synchronized</span>(<span class="cm-keyword">this</span>) {</span></pre>
+<pre class=" CodeMirror-line " role="presentation"><span role="presentation">    <span class="cm-variable">mutextMethod</span>();  </span></pre>
+<pre class=" CodeMirror-line " role="presentation"><span role="presentation">  }</span></pre>
+<pre class=" CodeMirror-line " role="presentation"><span role="presentation">  <span class="cm-variable">othercode2</span>(); </span></pre>
+<pre class=" CodeMirror-line " role="presentation"><span role="presentation">}</span></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div>&nbsp;</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<h2 id="id-锁粗化">锁粗化</h2>
+<p>大部分情况下我们是要让锁的粒度最小化，锁的粗化则是要增大锁的粒度;</p>
+<p>在以下场景下需要粗话锁的粒度：</p>
+<p>假如有一个循环，循环内的操作需要加锁，我们应该把锁放到循环外面，否则每次进出循环，都进出一次临界区，效率是非常差的；</p>
+<h2 id="id-锁消除">锁消除</h2>
+<p>锁消除是在编译器级别的事情。</p>
+<p>在即时编译时，如果发现不可能被共享的对象，则可以消除这些对象的锁操作。</p>
+<p>也许你会觉得奇怪，既然有些对象不可能被多线程访问，那为什么要加锁呢？写代码时直接不加锁不就好了。</p>
+<p>但是有时，这些锁并不是程序员所写的，有的是JDK实现中就有锁的，比如Vector和StringBuffer这样的类，它们中的很多方法都是有锁的。当我们在一些不会有线程安全的情况下使用这些类的方法时，达到某些条件时，编译器会将锁消除来提高性能。</p>
+<p>开启锁消除是在JVM参数上设置的，当然需要在server模式下：</p>
+<p>-server&nbsp;-XX:+DoEscapeAnalysis&nbsp;-XX:+EliminateLocks</p>
+<h2 id="id-分离锁(lockstriping)">分离锁 (lock striping)&nbsp;</h2>
+<p>分离锁的实现：</p>
+<ol>
+<li>
+<p>使用多个Object作为synchronized的代码块的"对象锁"</p>
+</li>
+<li>
+<p>在取出或者写入的利用获取对象的hash%锁数量，随即使用一个"对象锁"</p>
+</li>
+</ol>
+<p>具体案例：HashTable--》ConcurrentHashMap</p>
+<h2 id="id-分拆锁(locksplitting)">分拆锁 (lock splitting)&nbsp;</h2>
+<ul>
+<li>
+<p>ReadWriteLock</p>
+</li>
+<li>
+<p>JDK 1.8的StampedLock</p>
+</li>
+</ul>
+<p>StampedLock与ReadWriteLock的区别在于，StampedLock认为读不应阻塞写，StampedLock认为当读写互斥的时候，读应该是重读，而不是不让写线程写。这样的设计解决了读多写少时，使用ReadWriteLock会产生写线程饥饿现象。</p>
+<p>所以StampedLock是一种偏向于写线程的改进。</p>
+<h1 id="id-扩展阅读">扩展阅读</h1>
+<p>Java 8：StampedLock，ReadWriteLock以及synchronized的比较：<a class="ct-link" title="http://colobu.com/2016/06/01/Java-8-StampedLocks-vs-ReadWriteLocks-and-Synchronized/" spellcheck="false" href="http://colobu.com/2016/06/01/Java-8-StampedLocks-vs-ReadWriteLocks-and-Synchronized/" target="_blank" rel="noopener">http://colobu.com/2016/06/01/Java-8-StampedLocks-vs-ReadWriteLocks-and-Synchronized/</a></p>
+<p><a class="ct-link" title="Building Block In Java Concurrent Programming" spellcheck="false" href="https://km.sankuai.com/page/28370629" target="_blank" rel="noopener">Building Block In Java Concurrent Programming</a></p>
+<p><a class="ct-link" title="http://blog.csdn.net/zqz_zqz/article/details/70233767" spellcheck="false" href="http://blog.csdn.net/zqz_zqz/article/details/70233767" target="_blank" rel="noopener">http://blog.csdn.net/zqz_zqz/article/details/70233767</a></p>
+<p><a class="ct-link" title="https://my.oschina.net/hosee/blog/615865" spellcheck="false" href="https://my.oschina.net/hosee/blog/615865" target="_blank" rel="noopener">https://my.oschina.net/hosee/blog/615865</a></p>
+<p><a class="ct-link" title="https://www.jfh.com/jfperiodical/article/4670" spellcheck="false" href="https://www.jfh.com/jfperiodical/article/4670" target="_blank" rel="noopener">https://www.jfh.com/jfperiodical/article/4670</a></p>
