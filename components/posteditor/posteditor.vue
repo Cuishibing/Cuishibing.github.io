@@ -1,7 +1,7 @@
 <template>
   <div>
     <div style="display: flex; justify-content: center;align-items: center;">
-      <h2 style="text-align:right;width: 50%;">{{this.$route.query.i}}</h2>
+      <h2 style="text-align:right;width: 50%;">{{this.$route.query.p}}</h2>
 
       <span style="width:50%; display: flex; justify-content: right;">
         <button style="margin-left: 5px;margin-right: 5px;"
@@ -23,7 +23,8 @@
 
 <script>
 import { getFile, saveFile, deleteFile } from '/js/filefactory.js'
-const CATEGORY_FILE_KEY = "/meta/categoryInfo.json"
+
+import { categoryApi } from "/js/api.js"
 export default {
   data() {
     return {
@@ -37,27 +38,10 @@ export default {
     edit() {
       this.initEditor()
     },
-    deleteFile() {
-      deleteFile(this.path)
-      getFile(CATEGORY_FILE_KEY).then(data=>{
-        let categories = JSON.parse(data)
-        for (const c of categories) {
-          if (c.name != this.cname) {
-            continue
-          }
-          if (!c.postList) {
-            return
-          }
-          let targetIndex = c.postList.findIndex(v=>{
-            return v.name = this.pname
-          })
-          if (targetIndex > -1) {
-            c.postList.splice(targetIndex, 1)
-          }
-        }
-        saveFile(CATEGORY_FILE_KEY, JSON.stringify(categories))
-        this.$router.back()
-      })
+    async deleteFile() {
+      await deleteFile(this.path)
+      await categoryApi.deletePost(this.cname, this.pname)
+      this.$router.back()
     },
     initEditor() {
       const useDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches;
@@ -130,9 +114,10 @@ export default {
     }
   },
   mounted() {
-    let path = `/posts/${this.$route.query.i}/index`
+    
     this.cname = this.$route.query.c
-    this.pname = this.$route.query.i
+    this.pname = this.$route.query.p
+    let path = `/posts/${this.cname}/${this.pname}/index`
     this.path = path
 
     getFile(path).then(data => {

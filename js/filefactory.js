@@ -55,6 +55,7 @@ class FileCache {
 
   async deleteFile(path) {
     try {
+      debugger
       let fileContent = null
       try {
         fileContent = await this.getFile(path)

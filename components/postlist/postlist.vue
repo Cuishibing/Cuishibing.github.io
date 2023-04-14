@@ -2,23 +2,23 @@
   <div>
     <ol>
       <li class="postitem" v-for="p in postList" :key="p.name"><a
-          :href="'index.html#/posteditor?c=' + cname + '&i=' + p.name">{{ p.name }}</a></li>
+          :href="'index.html#/posteditor?c=' + cname + '&p=' + p.name">{{ p.name }}</a></li>
 
       <div style="display:flex">
-        <input v-model="newPostName" v-if="showPostInut" /> <button @click="addPost">{{ showPostInut ? '确认' : '+' }}</button>
+        <input v-model="newPostName" v-if="showPostInut" /> <button @click="addPost">{{ showPostInut ? '确认' : '+'
+        }}</button>
       </div>
     </ol>
   </div>
 </template>
 
 <script>
-import { getFile, saveFile } from "/js/filefactory.js"
 
-const CATEGORY_FILE_KEY = "/meta/categoryInfo.json"
+import { categoryApi } from "/js/api.js"
+
 export default {
   data() {
     return {
-      categories: [],
       postList: [],
       newPostName: "",
       showPostInut: false
@@ -30,19 +30,12 @@ export default {
       if (this.newPostName == null || this.newPostName === undefined || this.newPostName === "") {
         return
       }
-      let index = this.postList.findIndex(p => {
-        return p.name == this.newPostName
-      })
-      if (index > -1) {
-        return
-      }
 
-      this.postList.push({
-        name: this.newPostName
+      categoryApi.addPost(this.cname, this.newPostName).then(data => {
+        this.newPostName = ""
+        this.getPostList()
       })
-      this.newPostName = ""
 
-      saveFile(CATEGORY_FILE_KEY, JSON.stringify(this.categories))
     }
     ,
     getPostList() {
@@ -51,17 +44,8 @@ export default {
         return
       }
 
-      getFile(CATEGORY_FILE_KEY).then(data => {
-        this.categories = JSON.parse(data)
-        for (const c of this.categories) {
-          if (c.name == this.cname) {
-            if (c.postList == null) {
-              c.postList = []
-            }
-            this.postList = c.postList
-            break
-          }
-        }
+      categoryApi.getPostList(this.cname).then(data => {
+        this.postList = data
       })
     }
   },

@@ -10,9 +10,7 @@
 </template>
 
 <script>
-import { getFile, saveFile } from "/js/filefactory.js"
-
-const CATEGORY_FILE_KEY = "/meta/categoryInfo.json"
+import { categoryApi } from "/js/api.js"
 
 export default {
   data() {
@@ -36,27 +34,20 @@ export default {
         return
       }
 
-      let index = this.categories.findIndex(v => {
-        return v.name == this.newCategoryName
+      categoryApi.addCategory(this.newCategoryName).then(data => {
+        this.newCategoryName = ""
+        this.loadAllCategory()
       })
+    },
 
-      if (index > -1) {
-        return
-      }
-
-      this.categories.push({
-        name: this.newCategoryName
+    loadAllCategory() {
+      categoryApi.getAllCategory().then(data => {
+        this.categories = data
       })
-
-      this.newCategoryName = ""
-
-      saveFile(CATEGORY_FILE_KEY, JSON.stringify(this.categories))
     }
   },
   mounted() {
-    getFile(CATEGORY_FILE_KEY).then(data => {
-      this.categories = JSON.parse(data)
-    })
+    this.loadAllCategory()
   }
 }
 </script>

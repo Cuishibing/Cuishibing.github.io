@@ -57,12 +57,18 @@ const options = {
 const options2 = {
     moduleCache: { vue: Vue },
     async getFile(url) {
-        const res = getFileFromCache(url)
+        const res = await getFileFromCache(url)
+        
+
         if (/.*?\.html$/.test(url)) {
             return {
                 type: ".vue",
                 getContentData: (asBinary) => {
-                    return res
+                    if (asBinary) {
+                        return res
+                    } else {
+                        return res
+                    }
                 }
             }
         }
@@ -71,14 +77,22 @@ const options2 = {
             return {
                 type: ".mjs",
                 getContentData: (asBinary) => {
-                    return res
+                    if (asBinary) {
+                        return res
+                    } else {
+                        return res
+                    }
                 }
             }
         }
 
         return {
             getContentData: (asBinary) => {
-                return res
+                if (asBinary) {
+                    return res
+                } else {
+                    return res
+                }
             }
         }
 
