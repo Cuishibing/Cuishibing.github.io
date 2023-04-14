@@ -173,7 +173,7 @@ class FileCache {
         case FILE_STATUS.WAIT_DELETE:
           needCommitGitFiles.push({
             path: path,
-            content: fileObj.content,
+            content: this.getFile(path),
             needDelete: fileObj.status === FILE_STATUS.WAIT_DELETE
           })
           break;
