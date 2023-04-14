@@ -164,7 +164,7 @@ class FileCache {
 
   async commitAllFiles() {
     let needCommitGitFiles = []
-
+    let committedFile = []
     for (let path in this.fileList) {
       let fileObj = this.fileList[path]
       switch (fileObj.status) {
@@ -176,6 +176,7 @@ class FileCache {
             content: await this.getFile(path),
             needDelete: fileObj.status === FILE_STATUS.WAIT_DELETE
           })
+          committedFile.push(path)
           break;
       }
     }
@@ -190,27 +191,27 @@ class FileCache {
       alert("密码错误！")
       throw Error("密码错误！")
     }
-    console.info(token)
     let github = new Github("Cuishibing/Cuishibing.github.io", token)
 
-    github.commitFile(needCommitGitFiles).then(data => {
+    await github.commitFile(needCommitGitFiles).then(data => {
       alert("同步成功")
 
-      needCommitGitFiles.forEach(f => {
-        let fileObj = this.fileList[f.path]
+      committedFile.forEach(f => {
+        let fileObj = this.fileList[f]
         switch (fileObj.status) {
           case FILE_STATUS.NEW:
           case FILE_STATUS.MODIFIED:
             fileObj.status = FILE_STATUS.EXIST
             break;
           case FILE_STATUS.WAIT_DELETE:
-            Reflect.deleteProperty(this.fileList, f.path)
+            Reflect.deleteProperty(this.fileList, f)
             break;
 
           default:
             break;
         }
       })
+      this.syncData()
     })
   }
 
