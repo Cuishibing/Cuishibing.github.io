@@ -1,222 +1,235 @@
 import { Github } from "/js/github.js"
 import { getToken } from "/js/token.js"
 
-const fileStorageKey = "file_cache"
-
-class FileStateMachine {
-  constructor(fileObj, fileCache) {
-    this.fileObj = fileObj
-    this.fileCache = fileCache
-  }
-
-  isEmpty(o) {
-    return o === null || o === undefined || o === ""
-  }
-
-  getContent() {
-    if (this.isEmpty(this.fileObj)) {
-      return this.fileObj
-    }
-
-    switch (this.fileObj.status) {
-      case 'waitDelete': { return null } break
-      default: { return this.fileObj.content }
-    }
-  }
-
-  save() {
-    switch (this.fileObj.status) {
-      case 'new':
-      case 'exist_nosync': {
-        // nothing
-      } break
-      case 'exist': {
-        this.fileObj.status = 'exist_nosync'
-      } break
-    }
-    this.fileCache[this.fileObj.path] = this.fileObj
-  }
-
-  deleteFile() {
-
-    switch (this.fileObj.status) {
-      case 'new': {
-        Reflect.deleteProperty(this.fileCache, this.fileObj.path)
-      } break
-      case 'exist_nosync':
-      case 'exist': {
-        this.fileObj.status = 'wait_delete'
-        this.fileCache[this.fileObj.path] = this.fileObj
-      } break
-    }
-  }
-
-  syncFile() {
-    switch (this.fileObj.status) {
-      
-
-      case 'new':
-      case 'exist_nosync': {
-        this.fileObj.status = 'exist'
-        this.fileCache[this.fileObj.path] = this.fileObj
-      } break
-      case 'wait_delete': {
-        Reflect.deleteProperty(this.fileCache, this.fileObj.path)
-      } break
-    }
-  }
-
-  canSync() {
-    switch (this.fileObj.status) {
-      case 'new':
-      case 'wait_delete':
-      case 'exist_nosync': { return true } break
-    }
-
-    return false
-  }
+const FILE_STORE_KEY = "file_cache_key"
+const FILE_STATUS = {
+  EXIST: "exist",
+  NEW: "new",
+  WAIT_DELETE: "wait_delete",
+  MODIFIED: "modified"
 }
 
+class FileCache {
+  constructor(cacheKey) {
+    this.cacheKey = cacheKey
 
-const getFile = async path => {
-  if (path === null || path === undefined || path === "") {
-    throw Error("路径为空")
-  }
-  let cacheData = localStorage.getItem(fileStorageKey)
-  let fileCache;
-  if (cacheData) {
-    fileCache = JSON.parse(cacheData)
-  }
-
-  if (fileCache === null || fileCache === undefined) {
-    fileCache = {}
-    localStorage.setItem(fileStorageKey, JSON.stringify(fileCache))
-  }
-
-  if (fileCache[path]) {
-    return new FileStateMachine(fileCache[path], fileCache).getContent()
-  }
-  let content = await fetch(path).then(res => {
-    if (res.ok) {
-      return res.text()
+    if (cacheKey == null) {
+      throw new Error("cache key is null")
     }
-    if (res.status == 404) {
-      return null
-    }
-    throw Error(res)
-  })
 
-  if (content) {
-    fileCache[path] = {
+    this.cacheData = localStorage.getItem(this.cacheKey)
+    if (this.cacheData == null) {
+      this.cacheData = {
+        fileList: {}
+      }
+    } else {
+      this.cacheData = JSON.parse(this.cacheData)
+    }
+
+    this.fileList = this.cacheData.fileList
+  }
+
+  async getFile(path) {
+    try {
+      let cachedFile = this.fileList[path]
+      if (cachedFile == null) {
+        // 未命中缓存，尝试获取文件内容
+        let content = await this.fetchFile(path)
+        if (content != null) {
+          this.fileList[path] = this.createCacheFile(FILE_STATUS.EXIST, path, content)
+        }
+        return content
+      } else {
+        // 命中缓存，要判断下是否是删除状态
+        if (cachedFile.status == FILE_STATUS.WAIT_DELETE) {
+          return null
+        }
+        return localStorage.getItem(path)
+      }
+    } catch (error) {
+      throw error
+    } finally {
+      this.syncData()
+    }
+  }
+
+  async deleteFile(path) {
+    try {
+      let fileContent = null
+      try {
+        fileContent = await this.getFile(path)
+      } catch (error) {
+        
+      }
+      
+      if (fileContent == null) {
+        return
+      }
+      let cacheFile = this.fileList[path]
+      if (!cacheFile) {
+        return
+      }
+      switch (cacheFile.status) {
+        case FILE_STATUS.NEW:
+          Reflect.deleteProperty(this.fileList, path)
+          break;
+        case FILE_STATUS.MODIFIED:
+        case FILE_STATUS.EXIST:
+          cacheFile.status = FILE_STATUS.WAIT_DELETE
+          break;
+        default:
+          break;
+      }
+      localStorage.removeItem(path)
+    } catch (error) {
+      throw error
+    } finally {
+      this.syncData()
+    }
+  }
+
+  async saveFile(path, content) {
+    try {
+      await this.getFile(path)
+      let cacheFile = this.fileList[path]
+
+      if (cacheFile == null) {
+        this.fileList[path] = this.createCacheFile(FILE_STATUS.NEW, path, content)
+        return
+      }
+      localStorage.setItem(path, content)
+
+      switch (cacheFile.status) {
+        case FILE_STATUS.NEW:
+        case FILE_STATUS.MODIFIED:
+          // localStorage.setItem(path, content)
+          break;
+        case FILE_STATUS.EXIST:
+        case FILE_STATUS.WAIT_DELETE:
+          cacheFile.status = FILE_STATUS.MODIFIED
+          // localStorage.setItem(path, content)
+          break
+      }
+
+    } catch (error) {
+      throw error
+    } finally {
+      this.syncData()
+    }
+  }
+
+  async newFile(path, content) {
+    try {
+      if (path == null || content == null) {
+        throw Error("file is empth")
+      }
+      if (path == '' || content == '') {
+        throw Error("file is empth")
+      }
+      this.fileList[path] = this.createCacheFile(FILE_STATUS.NEW, path, content)
+      localStorage.setItem(path, content)
+    } catch (error) {
+      throw error
+    } finally {
+      this.syncData()
+    }
+  }
+
+  createCacheFile(fileStatus, path, content) {
+    if (content != null) {
+      localStorage.setItem(path, content)
+    }
+    return {
       path: path,
-      content: content,
-      status: "exist"
+      status: fileStatus
     }
-    localStorage.setItem(fileStorageKey, JSON.stringify(fileCache))
+  }
+
+  syncData() {
+    localStorage.setItem(FILE_STORE_KEY, JSON.stringify(this.cacheData))
+  }
+
+  async fetchFile(path) {
+    let content = await fetch(path).then(res => {
+      if (res.ok) {
+        return res.text()
+      }
+      if (res.status == 404) {
+        return null
+      }
+      throw Error(res)
+    })
     return content
   }
-  return content
+
+  async commitAllFiles() {
+    let needCommitGitFiles = []
+
+    for (let path in this.fileList) {
+      let fileObj = this.fileList[path]
+      switch (fileObj.status) {
+        case FILE_STATUS.NEW:
+        case FILE_STATUS.MODIFIED:
+        case FILE_STATUS.WAIT_DELETE:
+          needCommitGitFiles.push({
+            path: path,
+            content: fileObj.content,
+            needDelete: fileObj.status === FILE_STATUS.WAIT_DELETE
+          })
+          break;
+      }
+    }
+
+    if (needCommitGitFiles.length == 0) {
+      return
+    }
+
+
+    let token = await getToken()
+    if (!token) {
+      alert("密码错误！")
+      throw Error("密码错误！")
+    }
+    console.info(token)
+    let github = new Github("Cuishibing/Cuishibing.github.io", token)
+
+    github.commitFile(needCommitGitFiles).then(data => {
+      alert("同步成功")
+
+      needCommitGitFiles.forEach(f => {
+        let fileObj = this.fileList[f.path]
+        switch (fileObj.status) {
+          case FILE_STATUS.NEW:
+          case FILE_STATUS.MODIFIED:
+            fileObj.status = FILE_STATUS.EXIST
+            break;
+          case FILE_STATUS.WAIT_DELETE:
+            Reflect.deleteProperty(this.fileList, f.path)
+            break;
+
+          default:
+            break;
+        }
+      })
+    })
+  }
+
+}
+
+const getFile = async (path) => {
+  return new FileCache(FILE_STORE_KEY).getFile(path)
 }
 
 const saveFile = async (path, content) => {
-  if (path === null || path === undefined || path === "") {
-    return
-  }
-  let cacheData = localStorage.getItem(fileStorageKey)
-  let fileCache;
-  if (cacheData) {
-    fileCache = JSON.parse(cacheData)
-  }
-  if (fileCache === null || fileCache === undefined) {
-    fileCache = {}
-    localStorage.setItem(fileStorageKey, JSON.stringify(fileCache))
-  }
-
-  if (fileCache[path]) {
-    fileCache[path].content = content
-    new FileStateMachine(fileCache[path], fileCache).save()
-  } else {
-    fileCache[path] = {
-      path: path,
-      content: content,
-      status: 'new'
-    }
-  }
-  localStorage.setItem(fileStorageKey, JSON.stringify(fileCache))
+  return new FileCache(FILE_STORE_KEY).saveFile(path, content)
 }
 
 const deleteFile = async (path) => {
-  if (path === null || path === undefined || path === "") {
-    return
-  }
-  let cacheData = localStorage.getItem(fileStorageKey)
-  let fileCache;
-  if (cacheData) {
-    fileCache = JSON.parse(cacheData)
-  }
-  if (fileCache === null || fileCache === undefined) {
-    fileCache = {}
-    localStorage.setItem(fileStorageKey, JSON.stringify(fileCache))
-  }
-
-  if (fileCache[path]) {
-    let fileObj = fileCache[path]
-    fileObj.content = path[path.length - 1] === '/' ? null : ""
-
-    new FileStateMachine(fileObj, fileCache).deleteFile()
-    localStorage.setItem(fileStorageKey, JSON.stringify(fileCache))
-  }
+  return new FileCache(FILE_STORE_KEY).deleteFile(path)
 }
 
 const syncFiles = async () => {
-  let fileCacheData = localStorage.getItem(fileStorageKey)
-  if (fileCacheData == null) {
-    return
-  }
-
-  let commitFiles = []
-  let modifyFiles = []
-
-  let fileCache = JSON.parse(fileCacheData)
-  for (let path in fileCache) {
-    console.info("path:" + path)
-    let fileObj = fileCache[path]
-    
-    if (!new FileStateMachine(fileObj, fileCache).canSync()) {
-      continue
-    }
-
-    modifyFiles.push(fileObj)
-
-    commitFiles.push({
-      path: path,
-      content: fileObj.content,
-      needDelete: fileObj.status === 'wait_delete'
-    })
-  }
-  if (commitFiles.length === 0) {
-    return
-  }
-
-  modifyFiles.forEach(f=>{
-    new FileStateMachine(f, fileCache).syncFile()
-  })
-
-  let token = getToken()
-  if (!token) {
-    alert("密码错误！")
-    throw Error("密码错误！")
-  }
-  console.info(token)
-  let github = new Github("Cuishibing/Cuishibing.github.io", token)
-
-  github.commitFile(commitFiles).then(data => {
-    modifyFiles.forEach(f=>{
-      new FileStateMachine(f, fileCache).syncFile()
-    })
-    localStorage.setItem(fileStorageKey, JSON.stringify(fileCache))
-    alert("同步成功")
-  })
+  return new FileCache(FILE_STORE_KEY).commitAllFiles()
 }
 
 export { getFile, saveFile, deleteFile, syncFiles }

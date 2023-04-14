@@ -23,7 +23,7 @@
 
 <script>
 import { getFile, saveFile, deleteFile } from '/js/filefactory.js'
-import CategoryService from '/js/categoryapi.js'
+const CATEGORY_FILE_KEY = "/meta/categoryInfo.json"
 export default {
   data() {
     return {
@@ -39,8 +39,23 @@ export default {
     },
     deleteFile() {
       deleteFile(this.path)
-      CategoryService.init().then(cs => {
-        cs.deletePost(this.cname, this.pname)
+      getFile(CATEGORY_FILE_KEY).then(data=>{
+        let categories = JSON.parse(data)
+        for (const c of categories) {
+          if (c.name != this.cname) {
+            continue
+          }
+          if (!c.postList) {
+            return
+          }
+          let targetIndex = c.postList.findIndex(v=>{
+            return v.name = this.pname
+          })
+          if (targetIndex > -1) {
+            c.postList.splice(targetIndex, 1)
+          }
+        }
+        saveFile(CATEGORY_FILE_KEY, JSON.stringify(categories))
         this.$router.back()
       })
     },

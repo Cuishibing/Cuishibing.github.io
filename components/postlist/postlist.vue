@@ -1,23 +1,24 @@
 <template>
   <div>
     <ol>
-      <li class="postitem"
-        v-for="p in postList"
-        :key="p.name"><a :href="'index.html#/posteditor?c=' + cname + '&i=' + p.name">{{p.name}}</a></li>
+      <li class="postitem" v-for="p in postList" :key="p.name"><a
+          :href="'index.html#/posteditor?c=' + cname + '&i=' + p.name">{{ p.name }}</a></li>
 
       <div style="display:flex">
-        <input v-model="newPostName"
-          v-if="showPostInut" /> <button @click="addPost">{{showPostInut ? '确认': '+'}}</button>
+        <input v-model="newPostName" v-if="showPostInut" /> <button @click="addPost">{{ showPostInut ? '确认' : '+' }}</button>
       </div>
     </ol>
   </div>
 </template>
 
 <script>
-import CategoryService from '/js/categoryapi.js'
+import { getFile, saveFile } from "/js/filefactory.js"
+
+const CATEGORY_FILE_KEY = "/meta/categoryInfo.json"
 export default {
   data() {
     return {
+      categories: [],
       postList: [],
       newPostName: "",
       showPostInut: false
@@ -29,11 +30,19 @@ export default {
       if (this.newPostName == null || this.newPostName === undefined || this.newPostName === "") {
         return
       }
-      CategoryService.init().then(cs => {
-        cs.createPost(this.cname, this.newPostName)
-        this.newPostName = ""
-        this.getPostList()
+      let index = this.postList.findIndex(p => {
+        return p.name == this.newPostName
       })
+      if (index > -1) {
+        return
+      }
+
+      this.postList.push({
+        name: this.newPostName
+      })
+      this.newPostName = ""
+
+      saveFile(CATEGORY_FILE_KEY, JSON.stringify(this.categories))
     }
     ,
     getPostList() {
@@ -42,9 +51,18 @@ export default {
         return
       }
 
-      CategoryService.init().then(cs => [
-        this.postList = cs.getPosts(this.cname)
-      ])
+      getFile(CATEGORY_FILE_KEY).then(data => {
+        this.categories = JSON.parse(data)
+        for (const c of this.categories) {
+          if (c.name == this.cname) {
+            if (c.postList == null) {
+              c.postList = []
+            }
+            this.postList = c.postList
+            break
+          }
+        }
+      })
     }
   },
   mounted() {
