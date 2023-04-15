@@ -14,7 +14,7 @@
     </div>
 
     <div class="maineditor"
-      style="margin-left: 30px; margin-right: 30px;"
+      style="margin-left: 15%; margin-right: 15%;"
       v-html="content" />
 
   </div>
@@ -50,7 +50,7 @@ export default {
       let that = this
       tinymce.init({
         selector: '.maineditor',
-        plugins: 'preview importcss searchreplace autolink autosave save directionality code visualblocks visualchars fullscreen image link media template codesample table charmap pagebreak nonbreaking anchor insertdatetime advlist lists wordcount help charmap quickbars emoticons',
+        plugins: 'autoresize preview importcss searchreplace autolink autosave save directionality code visualblocks visualchars fullscreen image link media template codesample table charmap pagebreak nonbreaking anchor insertdatetime advlist lists wordcount help charmap quickbars emoticons',
         editimage_cors_hosts: ['picsum.photos'],
         menubar: 'file edit view insert format tools table help',
         toolbar: 'undo redo | bold italic underline strikethrough | fontfamily fontsize blocks | alignleft aligncenter alignright alignjustify | outdent indent |  numlist bullist | forecolor backcolor removeformat | pagebreak | charmap emoticons | fullscreen  preview save print | insertfile image media template link anchor codesample | ltr rtl',
@@ -101,7 +101,7 @@ export default {
         ],
         template_cdate_format: '[Date Created (CDATE): %m/%d/%Y : %H:%M:%S]',
         template_mdate_format: '[Date Modified (MDATE): %m/%d/%Y : %H:%M:%S]',
-        height: 600,
+        height: 1024,
         image_caption: true,
         quickbars_selection_toolbar: 'bold italic | quicklink h2 h3 blockquote quickimage quicktable',
         noneditable_class: 'mceNonEditable',
@@ -109,7 +109,7 @@ export default {
         contextmenu: 'link image table',
         skin: useDarkMode ? 'oxide-dark' : 'oxide',
         content_css: useDarkMode ? 'dark' : 'default',
-        content_style: 'body { font-family:Helvetica,Arial,sans-serif; font-size:16px }'
+        content_style: 'body { font-family:Helvetica,Arial,sans-serif; font-size:16px; margin-left: 15%; margin-right: 15%;}'
       });
     }
   },
