@@ -2,6 +2,8 @@ import { Github } from "/js/github.js"
 import { getToken } from "/js/token.js"
 
 const FILE_STORE_KEY = "file_cache_key"
+const FILE_CACHE_TIME = 0.5 * 3600000
+// const FILE_CACHE_TIME = 10000
 const FILE_STATUS = {
   EXIST: "exist",
   NEW: "new",
@@ -35,6 +37,7 @@ class FileCache {
       if (cachedFile == null) {
         // 未命中缓存，尝试获取文件内容
         let content = await this.fetchFile(path)
+        console.info("load file from net:", path)
         if (content != null) {
           this.fileList[path] = this.createCacheFile(FILE_STATUS.EXIST, path, content)
         }
@@ -44,6 +47,16 @@ class FileCache {
         if (cachedFile.status == FILE_STATUS.WAIT_DELETE) {
           return null
         }
+        // 存在的文件，要判断一下过期时间
+        if (cachedFile.status == FILE_STATUS.EXIST && cachedFile.lastUtime && cachedFile.lastUtime + FILE_CACHE_TIME < Date.now()) {
+          let content = await this.fetchFile(path)
+          console.info("load file from net:", path)
+          if (content != null) {
+            this.fileList[path] = this.createCacheFile(FILE_STATUS.EXIST, path, content)
+          }
+          return content
+        }
+        console.info("load file from cache:", path)
         return localStorage.getItem(path)
       }
     } catch (error) {
@@ -60,9 +73,9 @@ class FileCache {
       try {
         fileContent = await this.getFile(path)
       } catch (error) {
-        
+
       }
-      
+
       if (fileContent == null) {
         return
       }
@@ -77,6 +90,7 @@ class FileCache {
         case FILE_STATUS.MODIFIED:
         case FILE_STATUS.EXIST:
           cacheFile.status = FILE_STATUS.WAIT_DELETE
+          cacheFile.lastUtime = Date.now()
           break;
         default:
           break;
@@ -108,6 +122,7 @@ class FileCache {
         case FILE_STATUS.EXIST:
         case FILE_STATUS.WAIT_DELETE:
           cacheFile.status = FILE_STATUS.MODIFIED
+          cacheFile.lastUtime = Date.now()
           // localStorage.setItem(path, content)
           break
       }
@@ -142,7 +157,8 @@ class FileCache {
     }
     return {
       path: path,
-      status: fileStatus
+      status: fileStatus,
+      lastUtime: Date.now()
     }
   }
 
@@ -151,7 +167,7 @@ class FileCache {
   }
 
   async fetchFile(path) {
-    let content = await fetch(path).then(res => {
+    let content = await fetch(path + "?" + Math.random()).then(res => {
       if (res.ok) {
         return res.text()
       }
@@ -203,6 +219,7 @@ class FileCache {
           case FILE_STATUS.NEW:
           case FILE_STATUS.MODIFIED:
             fileObj.status = FILE_STATUS.EXIST
+            fileObj.lastUtime = Date.now()
             break;
           case FILE_STATUS.WAIT_DELETE:
             Reflect.deleteProperty(this.fileList, f)
