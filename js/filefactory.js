@@ -2,7 +2,7 @@ import { Github } from "/js/github.js"
 import { getToken } from "/js/token.js"
 
 const FILE_STORE_KEY = "file_cache_key"
-const FILE_CACHE_TIME = 3 * 3600000
+const FILE_CACHE_TIME = 15 * 60 * 1000
 // const FILE_CACHE_TIME = 10000
 const FILE_STATUS = {
   EXIST: "exist",
