@@ -1,21 +1,19 @@
 <template>
   <div>
     <div style="display: flex; justify-content: center;align-items: center;">
-      <h2 style="text-align:right;width: 50%;">{{this.$route.query.p}}</h2>
+      <h2 style="text-align:right;width: 50%;">{{ this.$route.query.p }}</h2>
 
       <span style="width:50%; display: flex; justify-content: right;">
-        <button style="margin-left: 5px;margin-right: 5px;"
-          @click="edit">编辑</button>
-        <button style="margin-left: 5px;margin-right: 5px;"
-          @click="save">保存</button>
-        <button style="margin-left: 5px;margin-right: 5px;"
-          @click="deleteFile">删除</button>
+        <button style="margin-left: 5px;margin-right: 5px;" @click="edit">编辑</button>
+        <button style="margin-left: 5px;margin-right: 5px;" @click="save">保存</button>
+        <button style="margin-left: 5px;margin-right: 5px;" @click="deleteFile">删除</button>
+        <button v-if="showEncrypt" style="margin-left: 5px;margin-right: 5px;" @click="encryptFile">加密</button>
+        <button v-if="showDecrypt" style="margin-left: 5px;margin-right: 5px;" @click="decryptFile">解密</button>
+      
       </span>
     </div>
 
-    <div class="maineditor"
-      style="margin-left: 15%; margin-right: 15%;"
-      v-html="content" />
+    <div class="maineditor" v-html="content" />
 
   </div>
 </template>
@@ -23,12 +21,14 @@
 
 <script>
 import { getFile, saveFile, deleteFile } from '/js/filefactory.js'
-
+import { encrypt, decrypt } from "/js/security.js"
 import { categoryApi } from "/js/api.js"
 export default {
   data() {
     return {
-      content: ''
+      content: '',
+      showDecrypt: true,
+      showEncrypt: true
     }
   },
   methods: {
@@ -36,6 +36,8 @@ export default {
       saveFile(this.path, tinymce.activeEditor.getContent())
     },
     edit() {
+      this.showDecrypt = false
+      this.showEncrypt = false
       this.initEditor()
     },
     async deleteFile() {
@@ -43,6 +45,33 @@ export default {
       await categoryApi.deletePost(this.cname, this.pname)
       this.$router.back()
     },
+
+    async encryptFile() {
+      let key = prompt('请输入密钥：');
+      encrypt(this.content, key).then(cipher=>{
+        this.content = cipher
+        // tinymce.activeEditor.setContent(this.content)
+        saveFile(this.path, this.content)
+      }).catch(err=>{
+        alert("加密失败")
+      })
+    },
+
+    async decryptFile() {
+      let key = prompt('请输入密钥：');
+      this.content = this.content.replace("<p>","")
+        this.content = this.content.replace("</p>","")
+      decrypt(this.content, key).then(text=>{
+        this.content = text
+        //tinymce.activeEditor.setContent(this.content)
+        saveFile(this.path, this.content)
+      }).catch(err=>{
+        console.error(err)
+        alert("解密失败")
+      })
+    },
+
+
     initEditor() {
       const useDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches;
       const isSmallScreen = window.matchMedia('(max-width: 1023.5px)').matches;
@@ -109,12 +138,12 @@ export default {
         contextmenu: 'link image table',
         skin: useDarkMode ? 'oxide-dark' : 'oxide',
         content_css: useDarkMode ? 'dark' : 'default',
-        content_style: 'body { font-family:Helvetica,Arial,sans-serif; font-size:16px; margin-left: 15%; margin-right: 15%;}'
+        content_style: 'body { font-family:"andale mono", monospace,Helvetica,Arial,sans-serif; font-size:14px; line-height:2}'
       });
     }
   },
   mounted() {
-    
+
     this.cname = this.$route.query.c
     this.pname = this.$route.query.p
     let path = `/posts/${this.cname}/${this.pname}/index`

@@ -2,9 +2,9 @@
   <div>
 
     <MHeader />
-    <div >
-        <Category />
-      <div >
+    <div>
+      <Category />
+      <div style="margin-left: 10%; margin-right: 10%;">
         <router-view />
       </div>
     </div>
@@ -26,5 +26,4 @@ export default {
 }
 </script>
 
-<style>
-</style>
+<style></style>
