@@ -1,0 +1,15 @@
+<p><span style="font-family: 'andale mono', monospace;">自签名证书可以使用openssl命令在本地生成，以下是在Windows系统下使用openssl生成自签名证书的示例：</span></p>
+<p><span style="font-family: 'andale mono', monospace;">1. 下载openssl：从官网（https://www.openssl.org/）下载openssl，并安装到本地。安装完成后，在命令提示符或者PowerShell中执行openssl命令。</span></p>
+<p><span style="font-family: 'andale mono', monospace;">2. 生成私钥：在命令提示符或者PowerShell中执行以下命令，生成一个2048位的RSA私钥：</span></p>
+<p><span style="font-family: 'andale mono', monospace;">&nbsp; &nbsp;```</span><br><span style="font-family: 'andale mono', monospace;">&nbsp; &nbsp;openssl genrsa -out key.pem 2048</span><br><span style="font-family: 'andale mono', monospace;">&nbsp; &nbsp;```</span></p>
+<p><span style="font-family: 'andale mono', monospace;">&nbsp; &nbsp;该命令将在当前目录下生成一个名为&ldquo;key.pem&rdquo;的私钥文件。</span></p>
+<p><span style="font-family: 'andale mono', monospace;">3. 生成证书请求：在命令提示符或者PowerShell中执行以下命令，生成一个证书请求文件：</span></p>
+<p><span style="font-family: 'andale mono', monospace;">&nbsp; &nbsp;```</span><br><span style="font-family: 'andale mono', monospace;">&nbsp; &nbsp;openssl req -new -key key.pem -out req.pem</span><br><span style="font-family: 'andale mono', monospace;">&nbsp; &nbsp;```</span></p>
+<p><span style="font-family: 'andale mono', monospace;">&nbsp; &nbsp;在执行该命令时，需要输入一些信息，例如国家、省份、城市、公司名称、邮箱等。其中，Common Name（CN）字段是最重要的字段，应该输入将要使用证书的域名或者IP地址。</span></p>
+<p><span style="font-family: 'andale mono', monospace;">4. 生成自签名证书：在命令提示符或者PowerShell中执行以下命令，使用私钥和证书请求文件生成自签名证书：</span></p>
+<p><span style="font-family: 'andale mono', monospace;">&nbsp; &nbsp;```</span><br><span style="font-family: 'andale mono', monospace;">&nbsp; &nbsp;openssl x509 -req -in req.pem -signkey key.pem -out cert.pem</span><br><span style="font-family: 'andale mono', monospace;">&nbsp; &nbsp;```</span></p>
+<p><span style="font-family: 'andale mono', monospace;">&nbsp; &nbsp;该命令将使用前面生成的私钥和证书请求文件生成一个自签名证书，输出文件名为&ldquo;cert.pem&rdquo;。</span></p>
+<p><span style="font-family: 'andale mono', monospace;">5. 将私钥和证书文件转换为PKCS12格式：在命令提示符或者PowerShell中执行以下命令，将私钥和证书文件转换为PKCS12格式：</span></p>
+<p><span style="font-family: 'andale mono', monospace;">&nbsp; &nbsp;```</span><br><span style="font-family: 'andale mono', monospace;">&nbsp; &nbsp;openssl pkcs12 -export -in cert.pem -inkey key.pem -out cert.p12</span><br><span style="font-family: 'andale mono', monospace;">&nbsp; &nbsp;```</span></p>
+<p><span style="font-family: 'andale mono', monospace;">&nbsp; &nbsp;该命令将把证书和私钥打包成一个PKCS12格式的文件，输出文件名为&ldquo;cert.p12&rdquo;。</span></p>
+<p><span style="font-family: 'andale mono', monospace;">执行以上命令后，您将在当前目录下生成三个文件：key.pem（私钥文件）、cert.pem（证书文件）和cert.p12（PKCS12文件）。在实际使用时，可以将私钥和证书文件放置在项目文件夹中，然后在Live Server配置中分别填入私钥和证书文件的完整路径。请注意，自签名证书不被浏览器信任，访问网站时可能会出现安全警告。在实际生产环境中，请使用由受信任的证书颁发机构（CA）签发的证书。</span></p>
