@@ -6,7 +6,7 @@ let myLoad = mvueloader("/components/loading/loading.vue")
 
 let msg = Vue.reactive({
   show: true,
-  title: '处理...'
+  title: '处理中...'
 })
 
 let $loading = Vue.createApp(myLoad, {msg}).mount(document.createElement("div"))

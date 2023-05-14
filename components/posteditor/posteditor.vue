@@ -149,8 +149,12 @@ export default {
     let path = `/posts/${this.cname}/${this.pname}/index`
     this.path = path
 
+    this.$load.show()
     getFile(path).then(data => {
       this.content = data
+      this.$load.hide()
+    }).catch(err=>{
+      this.$load.hide()
     })
   }
 }
