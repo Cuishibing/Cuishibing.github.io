@@ -1,6 +1,8 @@
 import { Github } from "/js/github.js"
 import { getToken } from "/js/token.js"
 
+import { load } from "/components/loading/loading.js"
+
 const FILE_STORE_KEY = "file_cache_key"
 const FILE_CACHE_TIME = 60 * 60 * 1000
 // const FILE_CACHE_TIME = 10000
@@ -236,7 +238,16 @@ class FileCache {
 }
 
 const getFile = async (path) => {
-  return new FileCache(FILE_STORE_KEY).getFile(path)
+  try {
+    debugger
+    load.show()
+    return new FileCache(FILE_STORE_KEY).getFile(path)  
+  } catch (error) {
+    
+  } finally {
+    load.hide()
+  }
+  
 }
 
 const saveFile = async (path, content) => {
@@ -248,7 +259,14 @@ const deleteFile = async (path) => {
 }
 
 const syncFiles = async () => {
-  return new FileCache(FILE_STORE_KEY).commitAllFiles()
+  try {
+    load.show()
+    return new FileCache(FILE_STORE_KEY).commitAllFiles()
+  } catch(error) {
+
+  } finally {
+    load.hide()
+  }
 }
 
 export { getFile, saveFile, deleteFile, syncFiles }
