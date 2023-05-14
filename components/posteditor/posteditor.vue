@@ -64,7 +64,7 @@ export default {
       decrypt(this.content, key).then(text=>{
         this.content = text
         //tinymce.activeEditor.setContent(this.content)
-        saveFile(this.path, this.content)
+        // saveFile(this.path, this.content)
       }).catch(err=>{
         console.error(err)
         alert("解密失败")
