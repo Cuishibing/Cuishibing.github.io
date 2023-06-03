@@ -4,7 +4,7 @@
     <MHeader />
     <div>
       <Category />
-      <div style="margin-left: 10%; margin-right: 10%;">
+      <div>
         <router-view />
       </div>
     </div>

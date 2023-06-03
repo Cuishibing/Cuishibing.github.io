@@ -9,7 +9,7 @@
         <button style="margin-left: 5px;margin-right: 5px;" @click="deleteFile">删除</button>
         <button v-if="showEncrypt" style="margin-left: 5px;margin-right: 5px;" @click="encryptFile">加密</button>
         <button v-if="showDecrypt" style="margin-left: 5px;margin-right: 5px;" @click="decryptFile">解密</button>
-      
+
       </span>
     </div>
 
@@ -48,24 +48,25 @@ export default {
 
     async encryptFile() {
       let key = prompt('请输入密钥：');
-      encrypt(this.content, key).then(cipher=>{
+      encrypt(this.content, key).then(cipher => {
         this.content = cipher
         // tinymce.activeEditor.setContent(this.content)
         saveFile(this.path, this.content)
-      }).catch(err=>{
+      }).catch(err => {
+        console.error(err)
         alert("加密失败")
       })
     },
 
     async decryptFile() {
       let key = prompt('请输入密钥：');
-      this.content = this.content.replace("<p>","")
-        this.content = this.content.replace("</p>","")
-      decrypt(this.content, key).then(text=>{
+      this.content = this.content.replace("<p>", "")
+      this.content = this.content.replace("</p>", "")
+      decrypt(this.content, key).then(text => {
         this.content = text
         //tinymce.activeEditor.setContent(this.content)
         // saveFile(this.path, this.content)
-      }).catch(err=>{
+      }).catch(err => {
         console.error(err)
         alert("解密失败")
       })
@@ -85,51 +86,85 @@ export default {
         toolbar: 'undo redo | bold italic underline strikethrough | fontfamily fontsize blocks | alignleft aligncenter alignright alignjustify | outdent indent |  numlist bullist | forecolor backcolor removeformat | pagebreak | charmap emoticons | fullscreen  preview save print | insertfile image media template link anchor codesample | ltr rtl',
         toolbar_sticky: true,
         toolbar_sticky_offset: isSmallScreen ? 102 : 108,
-        autosave_ask_before_unload: true,
-        autosave_interval: '30s',
-        autosave_prefix: '{path}{query}-{id}-',
-        autosave_restore_when_empty: false,
-        autosave_retention: '2m',
-        save_onsavecallback: () => {
-          that.save()
-        },
+        // autosave_ask_before_unload: true,
+        // autosave_interval: '30s',
+        // autosave_prefix: '{path}{query}-{id}-',
+        // autosave_restore_when_empty: false,
+        // autosave_retention: '2m',
+        // save_onsavecallback: () => {
+        //   that.save()
+        // },
         image_advtab: true,
-        link_list: [
-          { title: 'My page 1', value: 'https://www.tiny.cloud' },
-          { title: 'My page 2', value: 'http://www.moxiecode.com' }
-        ],
-        image_list: [
-          { title: 'My page 1', value: 'https://www.tiny.cloud' },
-          { title: 'My page 2', value: 'http://www.moxiecode.com' }
-        ],
-        image_class_list: [
-          { title: 'None', value: '' },
-          { title: 'Some class', value: 'class-name' }
-        ],
-        importcss_append: true,
-        file_picker_callback: (callback, value, meta) => {
-          /* Provide file and text for the link dialog */
-          if (meta.filetype === 'file') {
-            callback('https://www.google.com/logos/google.jpg', { text: 'My text' });
-          }
 
-          /* Provide image and alt text for the image dialog */
-          if (meta.filetype === 'image') {
-            callback('https://www.google.com/logos/google.jpg', { alt: 'My alt text' });
-          }
+        automatic_uploads: true,
+        images_upload_url: 'http://cuishibinghua.xicp.net:35690/upload',
+        images_upload_base_path: 'http://cuishibinghua.xicp.net:35690/download',
+        images_reuse_filename: true,
 
-          /* Provide alternative source and posted for the media dialog */
-          if (meta.filetype === 'media') {
-            callback('movie.mp4', { source2: 'alt.ogg', poster: 'https://www.google.com/logos/google.jpg' });
+        file_picker_callback: function (callback, value, meta) {
+          //文件分类
+          var filetype = '.pdf, .txt, .zip, .rar, .7z, .doc, .docx, .xls, .xlsx, .ppt, .pptx, .mp3, .mp4';
+          //后端接收上传文件的地址
+          var upurl = 'http://cuishibinghua.xicp.net:35690/upload';
+          //为不同插件指定文件类型及后端地址
+          switch (meta.filetype) {
+            case 'image':
+              filetype = '.jpg, .jpeg, .png, .gif';
+
+              break;
+            case 'media':
+              filetype = '.mp3, .mp4';
+              break;
+            case 'file':
+            default:
           }
+          //模拟出一个input用于添加本地文件
+          var input = document.createElement('input');
+          input.setAttribute('type', 'file');
+          input.setAttribute('accept', filetype);
+          input.click();
+          input.onchange = function () {
+            var file = this.files[0];
+
+            var xhr, formData;
+            console.log(file.name);
+            xhr = new XMLHttpRequest();
+            xhr.withCredentials = false;
+            xhr.open('POST', upurl);
+            
+            xhr.onload = function () {
+              var json;
+              if (xhr.status != 200) {
+                failure('HTTP Error: ' + xhr.status);
+                return;
+              }
+              json = JSON.parse(xhr.responseText);
+              if (!json || typeof json.location != 'string') {
+                failure('Invalid JSON: ' + xhr.responseText);
+                return;
+              }
+              callback('http://cuishibinghua.xicp.net:35690/download' + '/' + json.location);
+            };
+            formData = new FormData();
+            formData.append('file', file, file.name);
+            xhr.send(formData);
+
+          };
         },
-        templates: [
-          { title: 'New Table', description: 'creates a new table', content: '<div class="mceTmpl"><table width="98%%"  border="0" cellspacing="0" cellpadding="0"><tr><th scope="col"> </th><th scope="col"> </th></tr><tr><td> </td><td> </td></tr></table></div>' },
-          { title: 'Starting my story', description: 'A cure for writers block', content: 'Once upon a time...' },
-          { title: 'New list with dates', description: 'New List with dates', content: '<div class="mceTmpl"><span class="cdate">cdate</span><br><span class="mdate">mdate</span><h2>My List</h2><ul><li></li><li></li></ul></div>' }
-        ],
-        template_cdate_format: '[Date Created (CDATE): %m/%d/%Y : %H:%M:%S]',
-        template_mdate_format: '[Date Modified (MDATE): %m/%d/%Y : %H:%M:%S]',
+
+        // link_list: [
+        //   { title: 'My page 1', value: 'https://www.tiny.cloud' },
+        //   { title: 'My page 2', value: 'http://www.moxiecode.com' }
+        // ],
+        // image_list: [
+        //   { title: 'My page 1', value: 'https://www.tiny.cloud' },
+        //   { title: 'My page 2', value: 'http://www.moxiecode.com' }
+        // ],
+        // image_class_list: [
+        //   { title: 'None', value: '' },
+        //   { title: 'Some class', value: 'class-name' }
+        // ],
+        importcss_append: true,
         height: 1024,
         image_caption: true,
         quickbars_selection_toolbar: 'bold italic | quicklink h2 h3 blockquote quickimage quicktable',
@@ -153,7 +188,7 @@ export default {
     getFile(path).then(data => {
       this.content = data
       this.$load.hide()
-    }).catch(err=>{
+    }).catch(err => {
       this.$load.hide()
     })
   }
