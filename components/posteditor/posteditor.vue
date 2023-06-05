@@ -97,15 +97,15 @@ export default {
         image_advtab: true,
 
         automatic_uploads: true,
-        images_upload_url: 'http://cuishibinghua.xicp.net:35690/upload',
-        images_upload_base_path: 'http://cuishibinghua.xicp.net:35690/download',
+        images_upload_url: 'https://13t21401h9.yicp.fun/upload',
+        images_upload_base_path: 'https://13t21401h9.yicp.fun/download',
         images_reuse_filename: true,
 
         file_picker_callback: function (callback, value, meta) {
           //文件分类
           var filetype = '.pdf, .txt, .zip, .rar, .7z, .doc, .docx, .xls, .xlsx, .ppt, .pptx, .mp3, .mp4';
           //后端接收上传文件的地址
-          var upurl = 'http://cuishibinghua.xicp.net:35690/upload';
+          var upurl = 'https://13t21401h9.yicp.fun/upload';
           //为不同插件指定文件类型及后端地址
           switch (meta.filetype) {
             case 'image':
@@ -143,7 +143,7 @@ export default {
                 failure('Invalid JSON: ' + xhr.responseText);
                 return;
               }
-              callback('http://cuishibinghua.xicp.net:35690/download' + '/' + json.location);
+              callback('https://13t21401h9.yicp.fun' + '/' + json.location);
             };
             formData = new FormData();
             formData.append('file', file, file.name);
