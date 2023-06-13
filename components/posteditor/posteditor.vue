@@ -23,6 +23,10 @@
 import { getFile, saveFile, deleteFile } from '/js/filefactory.js'
 import { encrypt, decrypt } from "/js/security.js"
 import { categoryApi } from "/js/api.js"
+
+const FILE_STORATE = 'https://13t21401h9.yicp.fun'
+// const FILE_STORATE = 'http://192.168.18.152:9527'
+
 export default {
   data() {
     return {
@@ -97,15 +101,15 @@ export default {
         image_advtab: true,
 
         automatic_uploads: true,
-        images_upload_url: 'https://13t21401h9.yicp.fun/upload',
-        images_upload_base_path: 'https://13t21401h9.yicp.fun/download',
+        images_upload_url: FILE_STORATE + '/upload?d=' + that.cname + '/' + that.pname,
+        images_upload_base_path: FILE_STORATE + '/download?f=',
         images_reuse_filename: true,
 
         file_picker_callback: function (callback, value, meta) {
           //文件分类
           var filetype = '.pdf, .txt, .zip, .rar, .7z, .doc, .docx, .xls, .xlsx, .ppt, .pptx, .mp3, .mp4';
           //后端接收上传文件的地址
-          var upurl = 'https://13t21401h9.yicp.fun/upload';
+          var upurl = FILE_STORATE + '/upload?d=' + that.cname + '/' + that.pname;
           //为不同插件指定文件类型及后端地址
           switch (meta.filetype) {
             case 'image':
@@ -143,7 +147,7 @@ export default {
                 failure('Invalid JSON: ' + xhr.responseText);
                 return;
               }
-              callback('https://13t21401h9.yicp.fun' + '/' + json.location);
+              callback(json.location);
             };
             formData = new FormData();
             formData.append('file', file, file.name);
