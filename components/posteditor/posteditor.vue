@@ -147,7 +147,7 @@ export default {
                 failure('Invalid JSON: ' + xhr.responseText);
                 return;
               }
-              callback(json.location);
+              callback(FILE_STORATE + '/download?f=' + json.location);
             };
             formData = new FormData();
             formData.append('file', file, file.name);
