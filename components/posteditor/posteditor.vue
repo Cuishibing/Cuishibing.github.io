@@ -24,6 +24,7 @@ import { getFile, saveFile, deleteFile } from '/js/filefactory.js'
 import { encrypt, decrypt } from "/js/security.js"
 import { categoryApi } from "/js/api.js"
 
+const FILE_STORATE_HOST = "http://FILE_HOST/"
 const FILE_STORATE = 'https://13t21401h9.yicp.fun'
 // const FILE_STORATE = 'http://192.168.18.152:9527'
 
@@ -37,7 +38,7 @@ export default {
   },
   methods: {
     save() {
-      saveFile(this.path, tinymce.activeEditor.getContent())
+      saveFile(this.path, tinymce.activeEditor.getContent().replaceAll(FILE_STORATE, FILE_STORATE_HOST))
     },
     edit() {
       this.showDecrypt = false
@@ -190,7 +191,9 @@ export default {
 
     this.$load.show()
     getFile(path).then(data => {
-      this.content = data
+      debugger
+      this.content = data.replaceAll(FILE_STORATE_HOST, FILE_STORATE)
+      debugger
       this.$load.hide()
     }).catch(err => {
       this.$load.hide()
