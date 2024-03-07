@@ -8,7 +8,7 @@ categoryApi.getAllCategory = async () => {
   let categories = await getFile(CATEGORY_FILE_KEY)
   if (categories == null) {
     categories = []
-    await saveFile(CATEGORY_FILE_KEY, JSON.stringify(categories))
+    await saveFile(CATEGORY_FILE_KEY, JSON.stringify(categories, null, '\t'))
     return categories
   }
   categories = JSON.parse(categories)
@@ -29,7 +29,7 @@ categoryApi.addCategory = async (cname) => {
     name: cname
   })
 
-  await saveFile(CATEGORY_FILE_KEY, JSON.stringify(categories))
+  await saveFile(CATEGORY_FILE_KEY, JSON.stringify(categories, null, '\t'))
 }
 
 categoryApi.getPostList = async (cname) => {
@@ -39,7 +39,7 @@ categoryApi.getPostList = async (cname) => {
     return c.name == cname
   })
   if (index < 0) {
-    throw Error("error category")
+    throw Error("category is not exist")
   }
   let postList = categories[index].postList
   return postList == null ? [] : postList
@@ -52,7 +52,7 @@ categoryApi.addPost = async (cname, pname) => {
     return c.name == cname
   })
   if (index < 0) {
-    throw Error("error category")
+    throw Error("category is not exist")
   }
   let postList = categories[index].postList
   if (postList == null) {
@@ -69,7 +69,7 @@ categoryApi.addPost = async (cname, pname) => {
   postList.push({
     name: pname
   })
-  await saveFile(CATEGORY_FILE_KEY, JSON.stringify(categories))
+  await saveFile(CATEGORY_FILE_KEY, JSON.stringify(categories, null, '\t'))
 }
 
 categoryApi.deletePost = async (cname, pname) => {
@@ -79,7 +79,7 @@ categoryApi.deletePost = async (cname, pname) => {
     return c.name == cname
   })
   if (index < 0) {
-    throw Error("error category")
+    throw Error("category is not exist")
   }
   let postList = categories[index].postList
   if (postList == null) {
@@ -95,7 +95,26 @@ categoryApi.deletePost = async (cname, pname) => {
 
   postList.splice(index, 1)
 
-  await saveFile(CATEGORY_FILE_KEY, JSON.stringify(categories))
+  await saveFile(CATEGORY_FILE_KEY, JSON.stringify(categories, null, '\t'))
+}
+
+categoryApi.deleteCategory = async (cname) => {
+  let categories = await categoryApi.getAllCategory()
+
+  let index = categories.findIndex(c => {
+    return c.name == cname
+  })
+  if (index < 0) {
+    throw Error("category is not exist")
+  }
+  
+  let postList = categories[index].postList
+  if (postList != null && postList.length > 0) {
+    throw Error("post list is not empty")
+  }
+
+  categories.splice(index, 1)
+  await saveFile(CATEGORY_FILE_KEY, JSON.stringify(categories, null, '\t'))
 }
 
 export { categoryApi }

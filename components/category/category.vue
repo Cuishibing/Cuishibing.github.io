@@ -1,6 +1,6 @@
 <template>
   <div style="display:flex">
-    <button v-for="c in categories" class="category" :key="c.name" :name="c.name" @click="onCategoryClick(c.name)">
+    <button v-for="c in categories" class="category" :key="c.name" :name="c.name" @click="onCategoryClick(c.name)" @contextmenu.prevent.stop="deleteCategory(c.name)">
       {{ c.name }}
     </button>
     <input v-if="showAddInput" v-model="newCategoryName" /> <button class="category" @click="addCategory">{{ showAddInput
@@ -36,6 +36,12 @@ export default {
 
       categoryApi.addCategory(this.newCategoryName).then(data => {
         this.newCategoryName = ""
+        this.loadAllCategory()
+      })
+    },
+
+    deleteCategory(cname) {
+      categoryApi.deleteCategory(cname).then(data=>{
         this.loadAllCategory()
       })
     },
