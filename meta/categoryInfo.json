@@ -28,6 +28,9 @@
 		"postList": [
 			{
 				"name": "分析模式"
+			},
+			{
+				"name": "MentorJS"
 			}
 		]
 	},
