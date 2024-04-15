@@ -3,7 +3,7 @@ import { getToken } from "/js/token.js"
 
 
 const FILE_STORE_KEY = "file_cache_key"
-const FILE_CACHE_TIME = 60 * 60 * 1000
+const FILE_CACHE_TIME = 24 * 60 * 60 * 1000
 // const FILE_CACHE_TIME = 10000
 const FILE_STATUS = {
   EXIST: "exist",
@@ -64,6 +64,12 @@ class FileCache {
       throw error
     } finally {
       this.syncData()
+    }
+  }
+
+  async deleteAllFileCache() {
+    for (let path in this.fileList) {
+      localStorage.removeItem(path)
     }
   }
 
@@ -248,8 +254,12 @@ const deleteFile = async (path) => {
   return new FileCache(FILE_STORE_KEY).deleteFile(path)
 }
 
+const deleteAllFileCache = async ()=>{
+  return new FileCache(FILE_CACHE_TIME).deleteAllFileCache()
+}
+
 const syncFiles = async () => {
   return new FileCache(FILE_STORE_KEY).commitAllFiles()
 }
 
-export { getFile, saveFile, deleteFile, syncFiles }
+export { getFile, saveFile, deleteFile, deleteAllFileCache, syncFiles }
