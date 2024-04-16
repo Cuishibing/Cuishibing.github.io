@@ -16,6 +16,9 @@ categoryApi.getAllCategory = async () => {
 }
 
 categoryApi.addCategory = async (cname) => {
+  if (cname.indexOf(" ") >= 0) {
+    throw Error("category contains space")
+  }
   let categories = await categoryApi.getAllCategory()
 
   let index = categories.findIndex(c => {
@@ -46,6 +49,10 @@ categoryApi.getPostList = async (cname) => {
 }
 
 categoryApi.addPost = async (cname, pname) => {
+  if (pname.indexOf(" ") >= 0) {
+    throw Error("post name contains space")
+  }
+
   let categories = await categoryApi.getAllCategory()
 
   let index = categories.findIndex(c => {
