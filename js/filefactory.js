@@ -71,6 +71,7 @@ class FileCache {
     for (let path in this.fileList) {
       localStorage.removeItem(path)
     }
+    localStorage.removeItem(FILE_STORE_KEY)
   }
 
   async deleteFile(path) {
@@ -255,7 +256,7 @@ const deleteFile = async (path) => {
 }
 
 const deleteAllFileCache = async ()=>{
-  return new FileCache(FILE_CACHE_TIME).deleteAllFileCache()
+  return new FileCache(FILE_STORE_KEY).deleteAllFileCache()
 }
 
 const syncFiles = async () => {

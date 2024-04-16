@@ -85,7 +85,7 @@ export default {
       let that = this
       tinymce.init({
         selector: '.maineditor',
-        plugins: 'autoresize preview importcss searchreplace autolink autosave save directionality code visualblocks visualchars fullscreen image link media template codesample table charmap pagebreak nonbreaking anchor insertdatetime advlist lists wordcount help charmap quickbars emoticons',
+        plugins: 'autoresize preview importcss searchreplace autolink save directionality code visualblocks visualchars fullscreen image link media template codesample table charmap pagebreak nonbreaking anchor insertdatetime advlist lists wordcount help charmap quickbars emoticons',
         editimage_cors_hosts: ['picsum.photos'],
         menubar: 'file edit view insert format tools table help',
         toolbar: 'undo redo | bold italic underline strikethrough | fontfamily fontsize blocks | alignleft aligncenter alignright alignjustify | outdent indent |  numlist bullist | forecolor backcolor removeformat | pagebreak | charmap emoticons | fullscreen  preview save print | insertfile image media template link anchor codesample | ltr rtl',
@@ -102,60 +102,60 @@ export default {
         image_advtab: true,
 
         automatic_uploads: true,
-        images_upload_url: FILE_STORATE + '/upload?d=' + that.cname + '/' + that.pname,
-        images_upload_base_path: FILE_STORATE + '/download?f=',
+        // images_upload_url: FILE_STORATE + '/upload?d=' + that.cname + '/' + that.pname,
+        // images_upload_base_path: FILE_STORATE + '/download?f=',
         images_reuse_filename: true,
 
-        file_picker_callback: function (callback, value, meta) {
-          //文件分类
-          var filetype = '.pdf, .txt, .zip, .rar, .7z, .doc, .docx, .xls, .xlsx, .ppt, .pptx, .mp3, .mp4';
-          //后端接收上传文件的地址
-          var upurl = FILE_STORATE + '/upload?d=' + that.cname + '/' + that.pname;
-          //为不同插件指定文件类型及后端地址
-          switch (meta.filetype) {
-            case 'image':
-              filetype = '.jpg, .jpeg, .png, .gif';
+        // file_picker_callback: function (callback, value, meta) {
+        //   //文件分类
+        //   var filetype = '.pdf, .txt, .zip, .rar, .7z, .doc, .docx, .xls, .xlsx, .ppt, .pptx, .mp3, .mp4';
+        //   //后端接收上传文件的地址
+        //   var upurl = FILE_STORATE + '/upload?d=' + that.cname + '/' + that.pname;
+        //   //为不同插件指定文件类型及后端地址
+        //   switch (meta.filetype) {
+        //     case 'image':
+        //       filetype = '.jpg, .jpeg, .png, .gif';
 
-              break;
-            case 'media':
-              filetype = '.mp3, .mp4';
-              break;
-            case 'file':
-            default:
-          }
-          //模拟出一个input用于添加本地文件
-          var input = document.createElement('input');
-          input.setAttribute('type', 'file');
-          input.setAttribute('accept', filetype);
-          input.click();
-          input.onchange = function () {
-            var file = this.files[0];
+        //       break;
+        //     case 'media':
+        //       filetype = '.mp3, .mp4';
+        //       break;
+        //     case 'file':
+        //     default:
+        //   }
+        //   //模拟出一个input用于添加本地文件
+        //   var input = document.createElement('input');
+        //   input.setAttribute('type', 'file');
+        //   input.setAttribute('accept', filetype);
+        //   input.click();
+        //   input.onchange = function () {
+        //     var file = this.files[0];
 
-            var xhr, formData;
-            console.log(file.name);
-            xhr = new XMLHttpRequest();
-            xhr.withCredentials = false;
-            xhr.open('POST', upurl);
+        //     var xhr, formData;
+        //     console.log(file.name);
+        //     xhr = new XMLHttpRequest();
+        //     xhr.withCredentials = false;
+        //     xhr.open('POST', upurl);
             
-            xhr.onload = function () {
-              var json;
-              if (xhr.status != 200) {
-                failure('HTTP Error: ' + xhr.status);
-                return;
-              }
-              json = JSON.parse(xhr.responseText);
-              if (!json || typeof json.location != 'string') {
-                failure('Invalid JSON: ' + xhr.responseText);
-                return;
-              }
-              callback(FILE_STORATE + '/download?f=' + json.location);
-            };
-            formData = new FormData();
-            formData.append('file', file, file.name);
-            xhr.send(formData);
+        //     xhr.onload = function () {
+        //       var json;
+        //       if (xhr.status != 200) {
+        //         failure('HTTP Error: ' + xhr.status);
+        //         return;
+        //       }
+        //       json = JSON.parse(xhr.responseText);
+        //       if (!json || typeof json.location != 'string') {
+        //         failure('Invalid JSON: ' + xhr.responseText);
+        //         return;
+        //       }
+        //       callback(FILE_STORATE + '/download?f=' + json.location);
+        //     };
+        //     formData = new FormData();
+        //     formData.append('file', file, file.name);
+        //     xhr.send(formData);
 
-          };
-        },
+        //   };
+        // },
 
         // link_list: [
         //   { title: 'My page 1', value: 'https://www.tiny.cloud' },
@@ -191,9 +191,7 @@ export default {
 
     this.$load.show()
     getFile(path).then(data => {
-      debugger
       this.content = data.replaceAll(FILE_STORATE_HOST, FILE_STORATE)
-      debugger
       this.$load.hide()
     }).catch(err => {
       this.$load.hide()
