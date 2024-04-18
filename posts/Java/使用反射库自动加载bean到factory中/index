@@ -1,3 +1,4 @@
+<p><span style="font-family: 'arial black', sans-serif;">使用Reflections库来进行类扫描</span></p>
 <pre class="language-markup"><code>public class ModelFactory {
 
     private static Map&lt;String, Supplier&lt;Model&gt;&gt; modelMap = new HashMap&lt;&gt;();
@@ -46,3 +47,4 @@
     }
 }
 </code></pre>
+<p>&nbsp;</p>
