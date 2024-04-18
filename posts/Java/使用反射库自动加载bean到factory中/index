@@ -1,0 +1,48 @@
+<pre class="language-markup"><code>public class ModelFactory {
+
+    private static Map&lt;String, Supplier&lt;Model&gt;&gt; modelMap = new HashMap&lt;&gt;();
+
+    public static void registerModel(String name, Supplier&lt;Model&gt; modelSupplier) {
+        modelMap.put(name, modelSupplier);
+    }
+
+    static {
+        Reflections reflections = new Reflections("cui.shibing.biz"); // 替换为你的包名
+
+        // 获取实现了某个接口的类
+        Set&lt;Class&lt;? extends Model&gt;&gt; subTypesOfModel = reflections.getSubTypesOf(Model.class);// 替换为你的接口
+
+        for (Class&lt;? extends Model&gt; clazz : subTypesOfModel) {
+            int modifiers = clazz.getModifiers();
+            if (Modifier.isAbstract(modifiers) || Modifier.isInterface(modifiers) || Modifier.isPrivate(modifiers)) {
+                continue;
+            }
+            String name = "";
+            try {
+                name = clazz.newInstance().name();
+            } catch (InstantiationException | IllegalAccessException e) {
+                throw new RuntimeException(e);
+            }
+            registerModel(name, () -&gt; {
+                try {
+                    Model model = clazz.newInstance();
+                    model.init();
+                    return model;
+                } catch (InstantiationException | IllegalAccessException e) {
+                    throw new RuntimeException(e);
+                }
+            });
+
+        }
+    }
+
+
+    public static Model getModel(String modelName) {
+        Supplier&lt;Model&gt; modelSupplier = modelMap.get(modelName);
+        if (modelSupplier == null) {
+            return null;
+        }
+        return modelSupplier.get();
+    }
+}
+</code></pre>

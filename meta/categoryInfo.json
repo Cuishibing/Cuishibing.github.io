@@ -4,6 +4,9 @@
 		"postList": [
 			{
 				"name": "一些地址"
+			},
+			{
+				"name": "使用反射库自动加载bean到factory中"
 			}
 		]
 	},
