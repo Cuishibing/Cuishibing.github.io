@@ -1,0 +1,81 @@
+<p data-start="0" data-end="95">神经网络是模仿生物神经系统（例如大脑）的工作原理来处理数据的计算模型。它通常由多个层次的神经元组成，每一层的神经元都通过权重连接到前一层的神经元。神经网络的基本原理可以从以下几个方面来理解：</p>
+<h3 data-start="97" data-end="112">1. <strong data-start="104" data-end="112">基本构成</strong></h3>
+<ul data-start="116" data-end="371">
+<li data-start="116" data-end="184">
+<p data-start="118" data-end="184"><strong data-start="118" data-end="134">神经元（Neurons）</strong>：神经网络的基本单位，类似于生物神经系统中的神经细胞。每个神经元接收输入并进行处理，最终输出一个值。</p>
+</li>
+<li data-start="188" data-end="371">
+<p data-start="190" data-end="223"><strong data-start="190" data-end="203">层（Layers）</strong>：神经网络通常由多个层组成，常见的层有：</p>
+<ul data-start="229" data-end="371">
+<li data-start="229" data-end="263">
+<p data-start="231" data-end="263"><strong data-start="231" data-end="251">输入层（Input Layer）</strong>：接受外部数据作为输入。</p>
+</li>
+<li data-start="269" data-end="321">
+<p data-start="271" data-end="321"><strong data-start="271" data-end="293">隐藏层（Hidden Layers）</strong>：进行数据的处理和转换。可能有多层，每层包含多个神经元。</p>
+</li>
+<li data-start="327" data-end="371">
+<p data-start="329" data-end="371"><strong data-start="329" data-end="350">输出层（Output Layer）</strong>：输出最终的结果，通常是预测值或分类标签。</p>
+</li>
+</ul>
+</li>
+</ul>
+<h3 data-start="373" data-end="389">2. <strong data-start="380" data-end="389">输入和权重</strong></h3>
+<p data-start="393" data-end="489">每个神经元都会接收到来自前一层的输入信号，并且这些输入信号通常会乘以一个权重值（weight），这个权重控制信号的强度。每个神经元还会有一个偏置值（bias），它是一个常数，用来调整输出的值。</p>
+<ul data-start="494" data-end="574">
+<li data-start="494" data-end="525">
+<p data-start="496" data-end="525">输入信号：<span class="katex"><span class="katex-mathml">x1,x2,...,xnx_1, x_2, ..., x_n</span><span class="katex-html" aria-hidden="true"><span class="base"><span class="mord"><span class="mord mathnormal">x</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist"><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">1</span></span></span><span class="vlist-s">​</span></span></span></span></span><span class="mpunct">,</span><span class="mord"><span class="mord mathnormal">x</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist"><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span><span class="vlist-s">​</span></span></span></span></span><span class="mpunct">,</span><span class="mord">...</span><span class="mpunct">,</span><span class="mord"><span class="mord mathnormal">x</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist"><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">n</span></span></span><span class="vlist-s">​</span></span></span></span></span></span></span></span></p>
+</li>
+<li data-start="529" data-end="558">
+<p data-start="531" data-end="558">权重：<span class="katex"><span class="katex-mathml">w1,w2,...,wnw_1, w_2, ..., w_n</span><span class="katex-html" aria-hidden="true"><span class="base"><span class="mord"><span class="mord mathnormal">w</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist"><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">1</span></span></span><span class="vlist-s">​</span></span></span></span></span><span class="mpunct">,</span><span class="mord"><span class="mord mathnormal">w</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist"><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span><span class="vlist-s">​</span></span></span></span></span><span class="mpunct">,</span><span class="mord">...</span><span class="mpunct">,</span><span class="mord"><span class="mord mathnormal">w</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist"><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">n</span></span></span><span class="vlist-s">​</span></span></span></span></span></span></span></span></p>
+</li>
+<li data-start="562" data-end="574">
+<p data-start="564" data-end="574">偏置：<span class="katex"><span class="katex-mathml">bb</span><span class="katex-html" aria-hidden="true"><span class="base"><span class="mord mathnormal">b</span></span></span></span></p>
+</li>
+</ul>
+<p data-start="579" data-end="607">神经元的总输入是各个输入信号与权重的加权和，通常表示为：</p>
+<p><span class="katex-display"><span class="katex"><span class="katex-mathml">z=w1&sdot;x1+w2&sdot;x2+...+wn&sdot;xn+bz = w_1 \cdot x_1 + w_2 \cdot x_2 + ... + w_n \cdot x_n + b</span><span class="katex-html" aria-hidden="true"><span class="base"><span class="mord mathnormal">z</span><span class="mrel">=</span></span><span class="base"><span class="mord"><span class="mord mathnormal">w</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist"><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">1</span></span></span><span class="vlist-s">​</span></span></span></span></span><span class="mbin">&sdot;</span></span><span class="base"><span class="mord"><span class="mord mathnormal">x</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist"><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">1</span></span></span><span class="vlist-s">​</span></span></span></span></span><span class="mbin">+</span></span><span class="base"><span class="mord"><span class="mord mathnormal">w</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist"><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span><span class="vlist-s">​</span></span></span></span></span><span class="mbin">&sdot;</span></span><span class="base"><span class="mord"><span class="mord mathnormal">x</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist"><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span><span class="vlist-s">​</span></span></span></span></span><span class="mbin">+</span></span><span class="base"><span class="mord">...</span><span class="mbin">+</span></span><span class="base"><span class="mord"><span class="mord mathnormal">w</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist"><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">n</span></span></span><span class="vlist-s">​</span></span></span></span></span><span class="mbin">&sdot;</span></span><span class="base"><span class="mord"><span class="mord mathnormal">x</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist"><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">n</span></span></span><span class="vlist-s">​</span></span></span></span></span><span class="mbin">+</span></span><span class="base"><span class="mord mathnormal">b</span></span></span></span></span></p>
+<h3 data-start="685" data-end="721">3. <strong data-start="692" data-end="721">激活函数（Activation Function）</strong></h3>
+<p data-start="725" data-end="817">处理完加权输入后，神经元会应用一个激活函数（activation function）来决定输出值。激活函数的作用是引入非线性特性，使神经网络能够处理复杂的模式和任务。常见的激活函数有：</p>
+<ul data-start="821" data-end="939">
+<li data-start="821" data-end="853">
+<p data-start="823" data-end="853"><strong data-start="823" data-end="836">Sigmoid函数</strong>：常用于输出概率，值在0到1之间。</p>
+</li>
+<li data-start="857" data-end="911">
+<p data-start="859" data-end="911"><strong data-start="859" data-end="869">ReLU函数</strong>：Rectified Linear Unit，常用于隐藏层，能加速训练，输出非负值。</p>
+</li>
+<li data-start="915" data-end="939">
+<p data-start="917" data-end="939"><strong data-start="917" data-end="927">Tanh函数</strong>：输出值在-1到1之间。</p>
+</li>
+</ul>
+<p data-start="944" data-end="955">激活函数的一般形式是：</p>
+<p><span class="katex-display"><span class="katex"><span class="katex-mathml">a=f(z)a = f(z)</span><span class="katex-html" aria-hidden="true"><span class="base"><span class="mord mathnormal">a</span><span class="mrel">=</span></span><span class="base"><span class="mord mathnormal">f</span><span class="mopen">(</span><span class="mord mathnormal">z</span><span class="mclose">)</span></span></span></span></span></p>
+<p data-start="985" data-end="1022">其中，<span class="katex"><span class="katex-mathml">f(z)f(z)</span><span class="katex-html" aria-hidden="true"><span class="base"><span class="mord mathnormal">f</span><span class="mopen">(</span><span class="mord mathnormal">z</span><span class="mclose">)</span></span></span></span>是激活函数，<span class="katex"><span class="katex-mathml">zz</span><span class="katex-html" aria-hidden="true"><span class="base"><span class="mord mathnormal">z</span></span></span></span>是神经元的输入加权和。</p>
+<h3 data-start="1024" data-end="1060">4. <strong data-start="1031" data-end="1060">前向传播（Forward Propagation）</strong></h3>
+<p data-start="1064" data-end="1158">在神经网络的训练过程中，数据会从输入层通过隐藏层传递到输出层，这个过程叫做前向传播（forward propagation）。每经过一层，数据都会被权重和激活函数处理，直到输出层给出结果。</p>
+<h3 data-start="1160" data-end="1190">5. <strong data-start="1167" data-end="1190">损失函数（Loss Function）</strong></h3>
+<p data-start="1194" data-end="1230">损失函数用来衡量神经网络输出结果与真实值之间的差距。常见的损失函数包括：</p>
+<ul data-start="1234" data-end="1331">
+<li data-start="1234" data-end="1271">
+<p data-start="1236" data-end="1271"><strong data-start="1236" data-end="1249">均方误差（MSE）</strong>：用于回归任务，计算预测值与真实值的平方差。</p>
+</li>
+<li data-start="1275" data-end="1331">
+<p data-start="1277" data-end="1331"><strong data-start="1277" data-end="1306">交叉熵损失（Cross-Entropy Loss）</strong>：用于分类任务，衡量预测概率分布与真实分布的差异。</p>
+</li>
+</ul>
+<p data-start="1336" data-end="1347">损失函数的一般形式是：</p>
+<p><span class="katex-display"><span class="katex"><span class="katex-mathml">L=Loss(ypred,ytrue)L = \text{Loss}(y_{\text{pred}}, y_{\text{true}})</span><span class="katex-html" aria-hidden="true"><span class="base"><span class="mord mathnormal">L</span><span class="mrel">=</span></span><span class="base"><span class="mord text"><span class="mord">Loss</span></span><span class="mopen">(</span><span class="mord"><span class="mord mathnormal">y</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist"><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord text mtight">pred</span></span></span></span><span class="vlist-s">​</span></span></span></span></span><span class="mpunct">,</span><span class="mord"><span class="mord mathnormal">y</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist"><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord text mtight">true</span></span></span></span><span class="vlist-s">​</span></span></span></span></span><span class="mclose">)</span></span></span></span></span></p>
+<p data-start="1418" data-end="1478">其中，<span class="katex"><span class="katex-mathml">ypredy_{\text{pred}}</span><span class="katex-html" aria-hidden="true"><span class="base"><span class="mord"><span class="mord mathnormal">y</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist"><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord text mtight">pred</span></span></span></span><span class="vlist-s">​</span></span></span></span></span></span></span></span>是网络的预测输出，<span class="katex"><span class="katex-mathml">ytruey_{\text{true}}</span><span class="katex-html" aria-hidden="true"><span class="base"><span class="mord"><span class="mord mathnormal">y</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist"><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord text mtight">true</span></span></span></span><span class="vlist-s">​</span></span></span></span></span></span></span></span>是真实标签。</p>
+<h3 data-start="1480" data-end="1512">6. <strong data-start="1487" data-end="1512">反向传播（Backpropagation）</strong></h3>
+<p data-start="1516" data-end="1603">为了调整网络的权重和偏置，神经网络使用反向传播算法。这个算法通过计算损失函数相对于每个参数的梯度（偏导数），然后使用梯度下降等优化方法来更新权重和偏置，从而减小损失函数的值。</p>
+<p data-start="1608" data-end="1618">反向传播的基本步骤：</p>
+<ol data-start="1622" data-end="1682">
+<li data-start="1622" data-end="1639">
+<p data-start="1625" data-end="1639">计算损失函数对输出层的梯度。</p>
+</li>
+<li data-start="1643" data-end="1661">
+<p data-start="1646" data-end="1661">根据链式法则计算每一层的梯度。</p>
+</li>
+<li data-start="1665" data-end="1682">
+<p data-start="1668" data-end="1682">使用梯度下降更新权重和偏置。</p>
+</li>
+</ol>
